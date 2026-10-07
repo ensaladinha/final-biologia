@@ -1,0 +1,2335 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>VitaPet - Hábitos Saludables & Mascota Virtual</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f3f9',
+                            100: '#c7d2e1',
+                            200: '#a3b4cd',
+                            400: '#6c83b3',
+                            500: '#2b457d',
+                            600: '#223a6e',
+                            700: '#1a2332',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --sat: env(safe-area-inset-top, 0px);
+            --sab: env(safe-area-inset-bottom, 0px);
+            --sal: env(safe-area-inset-left, 0px);
+            --sar: env(safe-area-inset-right, 0px);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #1a2332 0%, #223a6e 50%, #6c83b3 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #1e293b;
+            padding-top: var(--sat);
+            padding-left: var(--sal);
+            padding-right: var(--sar);
+            overscroll-behavior-y: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        .glass-card-dark {
+            background: rgba(26, 35, 50, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #f8fafc;
+        }
+
+        .glass-nav {
+            background: rgba(26, 35, 50, 0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-bottom-bar {
+            background: rgba(26, 35, 50, 0.96);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            padding-bottom: max(var(--sab), 0.5rem);
+        }
+
+        .view-screen {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+        }
+        .view-screen.active {
+            display: block;
+            opacity: 1;
+        }
+        .view-screen.active-flex {
+            display: flex;
+            opacity: 1;
+        }
+
+        .option-btn {
+            display: flex;
+            align-items: center;
+            min-height: 48px;
+            padding: 10px 14px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 14px;
+            background-color: rgba(255, 255, 255, 0.95);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        .option-btn:active {
+            transform: scale(0.98);
+            background-color: #ffffff;
+            border-color: #223a6e;
+        }
+
+        .option-btn input[type="radio"],
+        .option-btn input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            accent-color: #223a6e;
+            flex-shrink: 0;
+        }
+
+        @keyframes bounce-slow {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-6px) scale(1.02); }
+        }
+        .animate-pet {
+            animation: bounce-slow 3.5s infinite ease-in-out;
+        }
+
+        .tab-btn {
+            min-height: 40px;
+            white-space: nowrap;
+            touch-action: manipulation;
+        }
+        .tab-btn.active {
+            background-color: #223a6e;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .bottom-nav-item.active {
+            color: #38bdf8;
+        }
+        .bottom-nav-item.active i {
+            transform: translateY(-2px);
+        }
+
+        .calendar-day-btn {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            position: relative;
+            transition: all 0.15s ease;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(203, 213, 225, 0.8);
+        }
+        .calendar-day-btn:active {
+            transform: scale(0.92);
+        }
+        .calendar-day-btn.other-month {
+            opacity: 0.3;
+            background: rgba(255, 255, 255, 0.15);
+        }
+        .calendar-day-btn.today {
+            border: 2px solid #2563eb;
+            color: #1e40af;
+            font-weight: 800;
+        }
+        .calendar-day-btn.selected {
+            background-color: #223a6e !important;
+            color: #ffffff !important;
+            border-color: #1a2332 !important;
+            box-shadow: 0 4px 10px rgba(34, 58, 110, 0.3);
+        }
+        .calendar-day-btn .has-events-dot {
+            width: 5px;
+            height: 5px;
+            background-color: #10b981;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 3px;
+        }
+        .calendar-day-btn.selected .has-events-dot {
+            background-color: #38bdf8;
+        }
+
+        /* ===== Control segmentado (navegación principal) ===== */
+        .seg {
+            --seg-radius: 16px;
+            --seg-accent: #2563eb;          /* lo actualiza el JS con el color de la sección activa */
+            --seg-bg: rgba(15, 23, 42, 0.3);
+            --seg-text: #e2e8f0;
+            --seg-text-hover: #ffffff;
+            --seg-on-pill: #ffffff;
+
+            position: relative;
+            display: flex;
+            width: 100%;
+            padding: 6px;
+            background: var(--seg-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--seg-radius);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            isolation: isolate;
+            perspective: 700px;
+            touch-action: pan-y;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .seg__pill {
+            position: absolute;
+            top: 6px;
+            bottom: 6px;
+            left: 0;
+            width: 0;
+            z-index: 0;
+            background: var(--seg-accent);
+            border-radius: max(4px, calc(var(--seg-radius) - 4px));
+            pointer-events: none;
+            will-change: transform, width;
+        }
+
+        .seg__btn {
+            position: relative;
+            z-index: 1;
+            flex: 1 1 0;
+            min-width: 0;
+            min-height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border: 0;
+            background: transparent;
+            border-radius: max(4px, calc(var(--seg-radius) - 4px));
+            font-family: inherit;
+            font-size: 0.75rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--seg-text);
+            white-space: nowrap;
+            cursor: pointer;
+            touch-action: manipulation;
+            transition: color 0.2s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .seg__btn span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .seg__btn:hover:not([aria-checked="true"]) {
+            color: var(--seg-text-hover);
+        }
+
+        .seg__btn:active {
+            transform: scale(0.95);
+        }
+
+        /* El texto se vuelve blanco con un pequeño retraso: espera a que el indicador llegue */
+        .seg__btn[aria-checked="true"] {
+            color: var(--seg-on-pill);
+            transition: color 0.3s ease 0.15s, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .seg__btn:focus-visible {
+            outline: 2px solid #ffffff;
+            outline-offset: 2px;
+        }
+
+        .seg__icon {
+            display: inline-block;
+            flex: none;
+            font-size: 0.8125rem;
+            line-height: 1;
+            transform-origin: center;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .seg__btn { transition: color 0.01s; }
+        }
+
+        /* Variante para la barra inferior del teléfono: ícono arriba, texto abajo */
+        .seg--bar {
+            --seg-radius: 18px;
+            padding: 5px;
+        }
+        .seg--bar .seg__pill {
+            top: 5px;
+            bottom: 5px;
+        }
+        .seg--bar .seg__btn {
+            flex-direction: column;
+            gap: 3px;
+            min-height: 48px;
+            padding: 6px 2px;
+            font-size: 0.625rem;
+        }
+        .seg--bar .seg__icon {
+            font-size: 1rem;
+        }
+    
+/* Mensaje motivador de bienvenida de la encuesta */
+.survey-motivation {
+    position: relative;
+    margin: 0 auto 26px;
+    padding: 22px 26px;
+    max-width: 820px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(255,255,255,.98), rgba(246,250,247,.98));
+    border: 1px solid rgba(45, 120, 75, .14);
+    box-shadow: 0 10px 28px rgba(34, 75, 48, .08);
+    text-align: center;
+    overflow: hidden;
+}
+.survey-motivation::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #4caf70, #82c995, #4caf70);
+}
+.survey-motivation-icon {
+    font-size: 30px;
+    margin-bottom: 7px;
+    display: block;
+}
+.survey-motivation-title {
+    margin: 0 0 7px;
+    font-size: 21px;
+    font-weight: 800;
+    color: #245c3a;
+    letter-spacing: -.2px;
+}
+.survey-motivation-text {
+    margin: 0 auto;
+    max-width: 680px;
+    color: #52645a;
+    font-size: 15.5px;
+    line-height: 1.6;
+}
+.survey-motivation-highlight {
+    color: #2f7d4a;
+    font-weight: 700;
+}
+@media (max-width: 600px) {
+    .survey-motivation {
+        padding: 19px 17px;
+        border-radius: 16px;
+        margin-bottom: 20px;
+    }
+    .survey-motivation-title {
+        font-size: 18px;
+    }
+    .survey-motivation-text {
+        font-size: 14px;
+    }
+}
+
+</style>
+<style id="pdf-reference-layout">
+/* ===== Reorganización visual basada en las maquetas del PDF =====
+   Mantiene la paleta, sombras y animaciones existentes; solo cambia la composición. */
+#screen-main { min-height: 100vh; }
+#screen-main > nav.glass-nav { padding-top: 10px; padding-bottom: 10px; }
+#screen-main > nav.glass-nav .max-w-7xl { max-width: 620px; }
+#screen-main > main {
+    max-width: 620px !important;
+    padding: 10px 10px 88px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    gap: 10px;
+}
+#screen-main > main > .glass-card-dark:first-child {
+    border-radius: 12px !important;
+    padding: 10px 12px !important;
+    margin-bottom: 0 !important;
+}
+#screen-main > main > .glass-card-dark:first-child h2 { font-size: 15px !important; }
+#screen-main > main > .glass-card-dark:first-child p { font-size: 9px !important; }
+
+/* El PDF utiliza la barra de iconos como navegación principal. */
+#mainTabSelector { display: none !important; }
+#bottom-nav:not(.hidden) { display: block !important; }
+#bottom-nav.hidden { display: none !important; }
+#bottom-nav > div { max-width: 620px; margin: 0 auto; }
+#bottom-nav .seg { border-radius: 0 !important; padding: 5px 7px 7px; background: rgba(26,35,50,.96); border: 0; }
+#bottom-nav .seg__btn { min-height: 46px; padding: 6px 4px; flex-direction: column; gap: 2px; font-size: 8px; }
+#bottom-nav .seg__icon { font-size: 20px; }
+#bottom-nav .seg__pill { top: 5px; bottom: 7px; border-radius: 9px; opacity: .9; }
+
+/* Inicio: composición vertical tipo pantalla de la maqueta. */
+#tab-dashboard > .grid { display: flex !important; flex-direction: column !important; gap: 9px !important; }
+#tab-dashboard > .grid > .glass-card:first-child { order: 2; }
+#tab-dashboard > .grid > .glass-card:last-child { order: 1; }
+#tab-dashboard .glass-card { border-radius: 12px !important; padding: 10px 12px !important; }
+#tab-dashboard > .grid > .glass-card:first-child { min-height: 250px; }
+#tab-dashboard > .grid > .glass-card:first-child .my-4 { margin-top: 12px !important; margin-bottom: 10px !important; }
+#tab-dashboard > .grid > .glass-card:first-child .w-28 { width: 92px !important; height: 92px !important; }
+#tab-dashboard #profileSummaryCards { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 5px !important; }
+#tab-dashboard #profileSummaryCards > div { padding: 7px !important; border-radius: 9px !important; }
+#tab-dashboard .bg-gradient-to-r.from-amber-500 { border-radius: 10px !important; padding: 9px 10px !important; }
+#tab-dashboard .bg-gradient-to-r.from-amber-500 h4 { font-size: 12px !important; }
+
+/* Todas las pestañas pasan a parecer una pantalla única, compacta y apilada. */
+#tab-nutrition, #tab-fitness, #tab-sleep { width: 100%; }
+#tab-nutrition > .glass-card,
+#tab-fitness > .glass-card-dark,
+#tab-sleep > .glass-card { border-radius: 12px !important; padding: 10px !important; }
+#tab-nutrition .grid, #tab-fitness .grid, #tab-sleep .grid { gap: 8px !important; }
+
+/* Cabeceras inspiradas directamente en las maquetas: banda azul + título grande. */
+#tab-nutrition::before, #tab-fitness::before, #tab-sleep::before {
+    display: block;
+    background: #223a6e;
+    color: #fff;
+    border-radius: 0;
+    padding: 9px 12px;
+    font-size: 22px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: .02em;
+    text-align: left;
+    margin-bottom: -2px;
+}
+#tab-nutrition::before { content: 'ALIMENTACIÓN'; }
+#tab-fitness::before { content: 'EJERCICIOS'; }
+#tab-sleep::before { content: 'SUEÑO'; }
+#tab-nutrition > .glass-card:first-child > .flex.items-center,
+#tab-fitness > .glass-card-dark:first-child > .flex.items-center,
+#tab-sleep > .glass-card:first-child > .flex.items-center { display:none !important; }
+
+/* Alimentación: bloques compactos como en la referencia. */
+#tab-nutrition > .glass-card:first-of-type .grid { grid-template-columns: 1fr !important; }
+#tab-nutrition > .glass-card:first-of-type .bg-white\/80,
+#tab-nutrition > .glass-card:nth-of-type(2) { border-radius: 10px !important; padding: 10px !important; }
+#tab-nutrition #waterCount, #tab-nutrition #waterGoal { font-size: 21px !important; }
+#tab-nutrition #mealPlan { grid-template-columns: 1fr 1fr !important; }
+
+/* Ejercicios: tarjetas más cercanas a las proporciones del prototipo. */
+#tab-fitness > .glass-card-dark:first-of-type { background: rgba(26,35,50,.92) !important; }
+#tab-fitness #routinesOutput > div > div { border-radius: 10px !important; padding: 9px !important; }
+#tab-fitness form { border-radius: 10px !important; }
+
+/* Sueño: primero registro, luego gráfico y finalmente herramientas. */
+#tab-sleep > .grid { grid-template-columns: 1fr !important; }
+#tab-sleep #sleepChart { height: 125px !important; }
+#tab-sleep .glass-card { border-radius: 10px !important; }
+#tab-sleep form { grid-template-columns: 1fr 1fr !important; }
+#tab-sleep form button { grid-column: 1 / -1 !important; }
+
+/* Pie informativo más discreto para no romper la apariencia de maqueta. */
+#screen-main > main > .glass-card.border-amber-300\/60 { border-radius: 10px !important; padding: 9px !important; }
+#screen-main > main > .glass-card.border-amber-300\/60 p { font-size: 9px !important; }
+
+@media (min-width: 700px) {
+    #screen-main > main { padding-top: 12px !important; }
+    #screen-main > nav.glass-nav { position: relative; }
+}
+@media (max-width: 430px) {
+    #screen-main > nav.glass-nav .text-xs.bg-indigo-500\/20 { padding-left: 8px; padding-right: 8px; }
+    #screen-main > main { padding-left: 7px !important; padding-right: 7px !important; }
+    #tab-nutrition::before, #tab-fitness::before, #tab-sleep::before { font-size: 20px; }
+}
+</style>
+
+
+<style id="survey-upgrade">
+    /* ===== Encuesta mejorada ===== */
+    #screen-survey {
+        background:
+            radial-gradient(circle at 15% 10%, rgba(56,189,248,.18), transparent 30%),
+            radial-gradient(circle at 85% 20%, rgba(99,102,241,.18), transparent 28%);
+    }
+
+    .survey-shell {
+        position: relative;
+    }
+
+    .survey-progress-card {
+        background: rgba(15, 23, 42, .34);
+        border: 1px solid rgba(255,255,255,.16);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-radius: 20px;
+        padding: 12px 13px 13px;
+        box-shadow: 0 10px 30px rgba(0,0,0,.14);
+    }
+
+    .survey-progress-top {
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:10px;
+        margin-bottom:9px;
+    }
+
+    .survey-progress-label {
+        display:flex;
+        align-items:center;
+        gap:8px;
+        min-width:0;
+    }
+
+    .survey-progress-badge {
+        width:30px;
+        height:30px;
+        border-radius:10px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        background:rgba(255,255,255,.14);
+        border:1px solid rgba(255,255,255,.15);
+        color:#fff;
+        font-size:11px;
+        font-weight:900;
+        flex-shrink:0;
+    }
+
+    .survey-progress-title {
+        color:#fff;
+        font-size:11px;
+        font-weight:800;
+        line-height:1.15;
+    }
+
+    .survey-progress-subtitle {
+        color:rgba(226,232,240,.78);
+        font-size:9px;
+        margin-top:2px;
+    }
+
+    .survey-progress-percent {
+        color:#fff;
+        font-size:12px;
+        font-weight:900;
+        background:rgba(255,255,255,.10);
+        padding:5px 8px;
+        border-radius:9px;
+        flex-shrink:0;
+    }
+
+    .survey-progress-track {
+        position:relative;
+        height:10px;
+        width:100%;
+        overflow:hidden;
+        border-radius:999px;
+        background:rgba(2,6,23,.48);
+        border:1px solid rgba(255,255,255,.13);
+    }
+
+    .survey-progress-fill {
+        position:relative;
+        height:100%;
+        width:20%;
+        min-width:0;
+        border-radius:999px;
+        background:linear-gradient(90deg,#38bdf8,#6366f1,#8b5cf6);
+        box-shadow:0 0 14px rgba(99,102,241,.45);
+        transition:width .55s cubic-bezier(.22,1,.36,1);
+    }
+
+    .survey-progress-fill::after {
+        content:"";
+        position:absolute;
+        inset:0;
+        background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);
+        transform:translateX(-100%);
+        animation:surveyShimmer 2.2s infinite;
+    }
+
+    @keyframes surveyShimmer {
+        0% { transform:translateX(-100%); }
+        55%,100% { transform:translateX(100%); }
+    }
+
+    .survey-progress-steps {
+        display:grid;
+        grid-template-columns:repeat(5,1fr);
+        gap:5px;
+        margin-top:9px;
+    }
+
+    .survey-progress-step {
+        height:4px;
+        border-radius:999px;
+        background:rgba(255,255,255,.16);
+        transition:background .3s ease, transform .3s ease;
+    }
+
+    .survey-progress-step.done {
+        background:rgba(255,255,255,.86);
+    }
+
+    .survey-progress-step.active {
+        background:#38bdf8;
+        transform:scaleY(1.45);
+    }
+
+    .survey-question-count {
+        color:#64748b;
+        font-size:9px;
+        font-weight:800;
+        letter-spacing:.04em;
+        text-transform:uppercase;
+        margin-bottom:7px;
+    }
+
+    .survey-step-content {
+        animation:surveyStepIn .3s ease both;
+    }
+
+    @keyframes surveyStepIn {
+        from { opacity:0; transform:translateY(8px); }
+        to { opacity:1; transform:translateY(0); }
+    }
+
+    #surveyForm .option-btn {
+        min-height:50px;
+        border-radius:15px;
+        padding:11px 13px;
+        border-width:1px;
+        box-shadow:0 2px 7px rgba(15,23,42,.04);
+    }
+
+    #surveyForm .option-btn:hover {
+        border-color:#6c83b3;
+        transform:translateY(-1px);
+        box-shadow:0 5px 12px rgba(34,58,110,.09);
+    }
+
+    #surveyForm .option-btn:has(input:checked) {
+        border-color:#223a6e;
+        background:linear-gradient(135deg,#f0f3f9,#ffffff);
+        box-shadow:0 5px 14px rgba(34,58,110,.12);
+    }
+
+    .survey-nav-btn {
+        min-height:46px;
+        border-radius:15px;
+    }
+
+    @media (max-width:430px) {
+        .survey-progress-card { padding:10px; }
+        .survey-progress-title { font-size:10px; }
+        .survey-progress-percent { font-size:11px; }
+        #surveyForm .option-btn { min-height:47px; }
+    }
+</style>
+
+</head>
+<body class="text-slate-800 antialiased flex flex-col min-h-screen pb-24 md:pb-0">
+
+    <div id="app" class="flex-grow flex flex-col">
+
+        <!-- Sección de Autenticación -->
+        <section id="screen-auth" class="view-screen active-flex flex-grow items-center justify-center p-4">
+            <div class="w-full max-w-sm mx-auto">
+                <div class="text-center mb-6">
+                    <div class="flex items-center justify-center gap-3 mb-3">
+                        <img src="data:image/webp;base64,UklGRtQFAABXRUJQVlA4IMgFAAAwJACdASrnAHcAPm00l0gkIyIhJRNqYIANiWNu8oxb/EYAWYB+gGk4gC0OVP3o376m9tB5iPOQ/z3qy8mbrS96Xrxb7x0eAW86x8xw87AG/QwT0t00XykZtFSbHZz2dEbmHzZrGv9yCWKpzntCpVo1B+h8F6C4yhfFODWEDTbWznGnyKgDgnu6vhTIqg59rvxRAjUqKKyFNCd4moyjKfu0v75OlpDJMdSvVhdx9nRjKTmcnRNRlCy+1TbUo8AcNttm+VZ7BzrH8xz8ARnjTrnC42H3HK/tVHY3Jh9d4mpdHQ885qDthRPG3+cUa6GDr3RonKQOZFhLlAlYHNzi58PqzXvGKkajMIv5FWEU9jQ/IE4zooqKsIn7aJ+nsbp/HOiRHkwM4yGb234QAP78Ss7vov/YD0n4C+5ZLvkXDEYW5YHdtxY5QpkRpg84eeC0knF2iuVU+gHKOm6pzFTySLF+4ZIOHxLn3sCgfK1zEVw+Y6EG93nf4Q53DqhX8Y6jPQX1ePKhP3G9d7xVR8tyPy+3kyy+mObcp3D4tGT9nLCYIiT9nLG6AIZt8H4alszG3WPbkwNgtdPFe9btpAfxQOWjAsYWH1MTPFiAZdw///kV/XhZN7xp66pMnHAP2ZcC6MY5xhqkt7qWJCcM/NxJs4evfbOtawFk4nveybVSu06JoFJcdkjfKKOzhDd2l8SmVHJIc2z707rk1Fkt8IdbESDwsQ7QN1sJ05VvmbAfkjB3OfV5W9lfRXGn94125EFePN2EBwD8SCQ+AFrmBir66570VfQDYWcbuzTGCY0jFKKQklGGF0kW8Ku2uKWmwvg9TWJQx5TR5vTwgQFaNAvzuP90HpZxO37nBqj+DlClt/1eZSnjv4y/v1agdQtj5Uo1+3lpX6wi1pu8j9w26GOrCRXL/piryeijgNhId1zDhBaqyljA5FKYMiUWnfApQFskaQz4XebnkTk+uOlQ1KksXSxD9rN7C69BtWkTbj1WX/u/VaMbgF/GVbsoxLqH+KRMlRRZwlIH2Blx/3qGtiTuKtdsvtD3d4yKel/Hryi+12qVtSMbMJZjPIV3bW3sJ+NwLI6eXOELVdknAusouFzylv5te2bBkmmKKwIXC3DAX8ARB7hqZ1B7+LCJPwplE/ZR0zTH4+ZwK3v1du9+OBG1l+v6BwKADilr7W15pLbSIuW8GzVgWYStC/Ix+zOJW1CzGPnIc8CWyhjADkF3NGMDeh8hlk092ZUjfKcwJ3+YZG3J8KTvDRXqmHzIDbjL225QURQxsAhFUON5evxUO/Eu4Xn/QrapXe9TrioMoGKedsEpnbiXbF4X6Rk2iCY+yZT1tDMqIY3Sj8zx5AfxjipskSbU4yqRMk/QfzCvKufPxf+jKOBzySF4xSETTYV3uzqzvac/abbs5wbhTiNFNMjmP0Kx7/Z6ka01GBJgOGGhH1ptSB+cpeJqHO/yaHGob5J8WrD6C4WvdMpRcbnMybwIVls0v47EfFCVz32KjkzwesaCiuv85AuHWat5J+Bw13f0FjpBntnSU4mTWCWbnUxokbQc9br/rvHOB5befYdr/zwYLGwvFDeX52D/4SBW7yYHW4aHDJna5q3HHQMCHJQtsSJsxWghUyzd0ZUCKgYAcpQMK/V1eXPUt/CJ4f2R6z1BW55ccr/pplWxOlm6GA9h77tzeEb4aD7foNhWeFLRV4V7mOdEt9PTIrxFvbfT35//BeQqgabbT87LZyGr1JmiWHEHJWH13ymsA/ideQ603tN3oFPGF0NnbtOVTqdd44Q5Bk7nHeVYkHMIoVBlT6xmT70M/hlwik2/9Q1uRTM/KA8WENjV8Nofav/CpvLzrq9h7Q/KWpWLUP6RCDA8A6mUSYAmmP5aoVRnMz+rFAgg7lNlHU4OH13zmzV9E/sUgUH99xourqmnVM4Z9NUAnzJvet6af4LHKGeMt20D3I74RkiKL+uTfOt+QAAA" alt="Logo ETec" class="w-20 h-20 rounded-2xl object-contain bg-white shadow-xl border-2 border-white/30">
+                        <div class="text-left">
+                            <h1 class="text-3xl font-extrabold text-white tracking-tight">VitaPet</h1>
+                            <p class="text-slate-200 text-[10px] mt-1 font-semibold">Proyecto de Biología · ETec</p>
+                        </div>
+                    </div>
+                    <p class="text-slate-200 text-xs mt-1 font-medium">Mascota Virtual & Hábitos Saludables</p>
+                </div>
+
+                <div class="glass-card rounded-3xl p-6 shadow-xl">
+                    <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1.5">Correo Electrónico</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                                <input type="email" id="auth-email" required class="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-300 focus:outline-none focus:border-brand-500 text-xs sm:text-sm bg-white font-medium shadow-sm" placeholder="usuario@vitapet.com">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1.5">Contraseña</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                                <input type="password" id="auth-password" required class="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-300 focus:outline-none focus:border-brand-500 text-xs sm:text-sm bg-white font-medium shadow-sm" placeholder="••••••••">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full mt-6 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-brand-600 to-brand-500 text-white font-bold text-sm shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                            <span>Ingresar</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de la Encuesta -->
+        <section id="screen-survey" class="view-screen flex-grow items-center justify-center p-3.5 sm:p-6 my-auto">
+            <div class="w-full max-w-lg mx-auto">
+
+                <div class="survey-progress-card mb-3">
+                    <div class="survey-progress-top">
+                        <div class="survey-progress-label">
+                            <div class="survey-progress-badge" id="surveyStepNum">1</div>
+                            <div class="min-w-0">
+                                <div class="survey-progress-title">
+                                    Paso <span id="surveyStepNumText">1</span> de <span id="surveyTotalSteps">5</span> ·
+                                    <span id="surveyStepName">Alimentación</span>
+                                </div>
+                                <div class="survey-progress-subtitle" id="surveyProgressHint">Empecemos por tus hábitos diarios</div>
+                            </div>
+                        </div>
+                        <div class="survey-progress-percent" id="surveyProgressPercent">20%</div>
+                    </div>
+                    <div class="survey-progress-track" aria-label="Progreso de la encuesta">
+                        <div id="surveyProgressBar" class="survey-progress-fill" style="width:20%;"></div>
+                    </div>
+                    <div class="survey-progress-steps" aria-hidden="true">
+                        <span class="survey-progress-step active"></span>
+                        <span class="survey-progress-step"></span>
+                        <span class="survey-progress-step"></span>
+                        <span class="survey-progress-step"></span>
+                        <span class="survey-progress-step"></span>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-3xl p-4 sm:p-6 shadow-2xl relative">
+                    <form id="surveyForm">
+                        
+                        
+<div class="survey-motivation" role="note" aria-label="Mensaje de motivación">
+    <span class="survey-motivation-icon">🌱</span>
+    <h3 class="survey-motivation-title">Tu mejor versión empieza con un pequeño paso</h3>
+    <p class="survey-motivation-text">
+        No necesitás cambiar todo de un día para el otro.
+        Esta encuesta es un punto de partida para <span class="survey-motivation-highlight">conocerte, descubrir qué podés mejorar y avanzar a tu propio ritmo</span>.
+        Tomate unos minutos, respondé con sinceridad y empezá hoy a construir hábitos que te hagan sentir mejor.
+    </p>
+</div>
+
+<div class="survey-step-content" data-step="1"><div class="survey-question-count">Tu alimentación e hidratación</div>
+                            <div class="bg-brand-50/70 p-3 rounded-2xl border border-brand-200 mb-3">
+                                <label class="block text-xs font-extrabold text-brand-700 mb-2">¿Qué hábito de los 3 estudiados querés mejorar primero?</label>
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                    <label class="option-btn"><input type="radio" name="habito/objetivo" value="alimentacion" checked> Alimentación</label>
+                                    <label class="option-btn"><input type="radio" name="habito/objetivo" value="ejercicio"> Ejercicio</label>
+                                    <label class="option-btn"><input type="radio" name="habito/objetivo" value="sueno"> Sueño</label>
+                                </div>
+                            </div>
+                            <div class="mb-3 border-b border-slate-300/80 pb-2.5">
+                                <h2 class="text-base sm:text-lg font-bold text-brand-600 flex items-center gap-2">
+                                    <i class="fa-solid fa-utensils text-brand-500"></i> 1. Alimentación e Hidratación
+                                </h2>
+                                <p class="text-[11px] text-slate-600 mt-0.5">Cuéntanos cómo te nutres día a día.</p>
+                            </div>
+
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">¿Cuántos vasos de agua consumes al día aproximadamente?</label>
+                                    <div class="grid grid-cols-1 gap-2">
+                                        <label class="option-btn"><input type="radio" name="agua" value="menos-3"> Menos de 3 vasos</label>
+                                        <label class="option-btn"><input type="radio" name="agua" value="3/5"> Entre 3 y 5 vasos</label>
+                                        <label class="option-btn"><input type="radio" name="agua" value="6/8" checked> Entre 6 y 8 vasos</label>
+                                        <label class="option-btn"><input type="radio" name="agua" value="mas-8"> Más de 8 vasos</label>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">¿Con qué frecuencia incluyes frutas y verduras?</label>
+                                    <select name="frutas/verduras" class="w-full p-3 rounded-2xl border border-slate-300 text-xs bg-white font-medium shadow-sm focus:border-brand-500 focus:outline-none">
+                                        <option value="">Selecciona una opción</option>
+                                        <option value="raro">Rara vez o nunca</option>
+                                        <option value="1/2 por semana">1 o 2 veces por semana</option>
+                                        <option value="diario (1 porción)">Todos los días (al menos 1 porción)</option>
+                                        <option value="diario (múltiples porciones)">Todos los días (múltiples porciones)</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">¿Cuál es tu principal desafío alimenticio?</label>
+                                    <div class="grid grid-cols-1 gap-2">
+                                        <label class="option-btn"><input type="checkbox" name="desafios/comida" value="ultraprocesados"> Consumo de ultraprocesados</label>
+                                        <label class="option-btn"><input type="checkbox" name="desafios/comida" value="horarios"> Horarios irregulares</label>
+                                        <label class="option-btn"><input type="checkbox" name="desafios/comida" value="ansiedad"> Comer por ansiedad o estrés</label>
+                                        <label class="option-btn"><input type="checkbox" name="desafios/comida" value="tiempo"> Falta de tiempo para cocinar</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="survey-step-content hidden" data-step="2"><div class="survey-question-count">Tu actividad física</div>
+                            <div class="mb-3 border-b border-slate-300/80 pb-2.5">
+                                <h2 class="text-base sm:text-lg font-bold text-brand-600 flex items-center gap-2">
+                                    <i class="fa-solid fa-person-running text-brand-500"></i> 2. Actividad Física
+                                </h2>
+                                <p class="text-[11px] text-slate-600 mt-0.5">Queremos entender cuánto mueves tu cuerpo.</p>
+                            </div>
+
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">¿Cuántos días a la semana realizas actividad física?</label>
+                                    <div class="grid grid-cols-1 gap-2">
+                                        <label class="option-btn"><input type="radio" name="ejercicio/frecuencia" value="0"> 0 días (Sedentario)</label>
+                                        <label class="option-btn"><input type="radio" name="ejercicio/frecuencia" value="1/2"> 1 a 2 días</label>
+                                        <label class="option-btn"><input type="radio" name="ejercicio/frecuencia" value="3/4" checked> 3 a 4 días</label>
+                                        <label class="option-btn"><input type="radio" name="ejercicio/frecuencia" value="5+"> 5 o más días</label>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">¿Qué actividades prefieres?</label>
+                                    <div class="grid grid-cols-1 gap-2">
+                                        <label class="option-btn"><input type="checkbox" name="tipo/ejercicio" value="cardio"> Cardio (Correr, bici, nadar)</label>
+                                        <label class="option-btn"><input type="checkbox" name="tipo/ejercicio" value="fuerza"> Fuerza / Pesas</label>
+                                        <label class="option-btn"><input type="checkbox" name="tipo/ejercicio" value="caminata"> Caminatas / Senderismo</label>
+                                        <label class="option-btn"><input type="checkbox" name="tipo/ejercicio" value="funcional"> Yoga / Pilates / Calistenia</label>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">¿Cuánto tiempo pasas sentado/a al día?</label>
+                                    <select name="tiempo/sentado" class="w-full p-3 rounded-2xl border border-slate-300 text-xs bg-white font-medium shadow-sm focus:border-brand-500 focus:outline-none">
+                                        <option value="">Selecciona una opción</option>
+                                        <option value="menos-4">Menos de 4 horas</option>
+                                        <option value="4/7">Entre 4 y 7 horas</option>
+                                        <option value="mas-8">Más de 8 horas</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="survey-step-content hidden" data-step="3"><div class="survey-question-count">Tu descanso y recuperación</div>
+                            <div class="mb-3 border-b border-slate-300/80 pb-2.5">
+                                <h2 class="text-base sm:text-lg font-bold text-brand-600 flex items-center gap-2">
+                                    <i class="fa-solid fa-moon text-brand-500"></i> 3. Descanso y Sueño
+                                </h2>
+                                <p class="text-[11px] text-slate-600 mt-0.5">Un buen descanso es la base de tu energía.</p>
+                            </div>
+
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">¿Cuántas horas duermes en promedio?</label>
+                                    <div class="grid grid-cols-1 gap-2">
+                                        <label class="option-btn"><input type="radio" name="horas/sueno" value="menos-5"> Menos de 5 horas</label>
+                                        <label class="option-btn"><input type="radio" name="horas/sueno" value="5/6"> 5 a 6 horas</label>
+                                        <label class="option-btn"><input type="radio" name="horas/sueno" value="7/8" checked> 7 a 8 horas</label>
+                                        <label class="option-btn"><input type="radio" name="horas/sueno" value="mas-8"> Más de 8 horas</label>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white/70 p-3.5 rounded-2xl border border-slate-200">
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Calidad de tu sueño (1 al 10)</label>
+                                    <input type="range" name="calidad/sueno" min="1" max="10" value="7" id="rangeSueno" class="w-full accent-brand-600 cursor-pointer h-2 bg-slate-200 rounded-lg">
+                                    <div class="text-center font-extrabold text-xs text-brand-600 mt-1.5" id="rangeSuenoVal">7 / 10</div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">¿Sueles despertar descansado/a?</label>
+                                    <select name="despertar/fresco" class="w-full p-3 rounded-2xl border border-slate-300 text-xs bg-white font-medium shadow-sm focus:border-brand-500 focus:outline-none">
+                                        <option value="">Selecciona una opción</option>
+                                        <option value="nunca">Rara vez o nunca</option>
+                                        <option value="a-veces">A veces</option>
+                                        <option value="siempre">Casi siempre / Siempre</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="survey-step-content hidden" data-step="4"><div class="survey-question-count">Tu bienestar mental</div>
+                            <div class="mb-3 border-b border-slate-300/80 pb-2.5">
+                                <h2 class="text-base sm:text-lg font-bold text-brand-600 flex items-center gap-2">
+                                    <i class="fa-solid fa-brain text-brand-500"></i> 4. Meditación y Enfoque
+                                </h2>
+                                <p class="text-[11px] text-slate-600 mt-0.5">Tu paz mental determina tu bienestar.</p>
+                            </div>
+
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">¿Experiencia previa en meditación?</label>
+                                    <div class="grid grid-cols-1 gap-2">
+                                        <label class="option-btn"><input type="radio" name="experiencia/meditacion" value="nunca"> Nunca lo he probado</label>
+                                        <label class="option-btn"><input type="radio" name="experiencia/meditacion" value="intentado" checked> Lo he intentado esporádicamente</label>
+                                        <label class="option-btn"><input type="radio" name="experiencia/meditacion" value="regular"> Practico ocasionalmente</label>
+                                        <label class="option-btn"><input type="radio" name="experiencia/meditacion" value="diario"> Medito diariamente</label>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white/70 p-3.5 rounded-2xl border border-slate-200">
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Nivel de estrés semanal (1 al 10)</label>
+                                    <input type="range" name="nivel/estres" min="1" max="10" value="5" id="rangeEstres" class="w-full accent-brand-600 cursor-pointer h-2 bg-slate-200 rounded-lg">
+                                    <div class="text-center font-extrabold text-xs text-brand-600 mt-1.5" id="rangeEstresVal">5 / 10</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="survey-step-content hidden" data-step="5"><div class="survey-question-count">Tu relación con las pantallas</div>
+                            <div class="mb-3 border-b border-slate-300/80 pb-2.5">
+                                <h2 class="text-base sm:text-lg font-bold text-brand-600 flex items-center gap-2">
+                                    <i class="fa-solid fa-mobile-screen-button text-brand-500"></i> 5. Desintoxicación Digital
+                                </h2>
+                                <p class="text-[11px] text-slate-600 mt-0.5">Desconectar para volver a conectar contigo.</p>
+                            </div>
+
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">¿Tiempo diario en pantallas por ocio?</label>
+                                    <div class="grid grid-cols-1 gap-2">
+                                        <label class="option-btn"><input type="radio" name="tiempo/pantallas" value="menos-1"> Menos de 1 hora</label>
+                                        <label class="option-btn"><input type="radio" name="tiempo/pantallas" value="1/3" checked> Entre 1 y 3 horas</label>
+                                        <label class="option-btn"><input type="radio" name="tiempo/pantallas" value="3/5"> Entre 3 y 5 horas</label>
+                                        <label class="option-btn"><input type="radio" name="tiempo/pantallas" value="mas-5"> Más de 5 horas</label>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">¿Pantallas justo al despertar o al dormir?</label>
+                                    <select name="pantalla/cama" class="w-full p-3 rounded-2xl border border-slate-300 text-xs bg-white font-medium shadow-sm focus:border-brand-500 focus:outline-none">
+                                        <option value="">Selecciona una opción</option>
+                                        <option value="ambos">Ambos (Despertar y acostarse)</option>
+                                        <option value="solo-despertar">Solo al despertar</option>
+                                        <option value="solo-dormir">Solo antes de dormir</option>
+                                        <option value="ninguno">Ninguno, lo evito</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">¿Aceptas un Detox Digital de 30 min diarios?</label>
+                                    <div class="grid grid-cols-1 gap-2">
+                                        <label class="option-btn"><input type="radio" name="dispuesta/detox" value="si" checked> Sí, totalmente</label>
+                                        <label class="option-btn"><input type="radio" name="dispuesta/detox" value="tal-vez"> Tal vez, me gustaría probar</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center mt-5 pt-3 border-t border-slate-300/80 gap-2">
+                            <button type="button" id="surveyPrevBtn" onclick="changeSurveyStep(-1)" class="px-4 py-3 rounded-2xl bg-slate-300/80 active:bg-slate-300 text-slate-800 font-bold text-xs disabled:opacity-40 transition flex items-center justify-center min-w-[90px]" disabled>
+                                <i class="fa-solid fa-chevron-left mr-1"></i> Anterior
+                            </button>
+                            <button type="button" id="surveyNextBtn" onclick="changeSurveyStep(1)" class="px-5 py-3 rounded-2xl bg-brand-600 active:bg-brand-700 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-1 min-w-[100px]">
+                                Siguiente <i class="fa-solid fa-chevron-right ml-1"></i>
+                            </button>
+                            <button type="submit" id="surveySubmitBtn" class="px-5 py-3 rounded-2xl bg-emerald-600 active:bg-emerald-700 text-white font-bold text-xs shadow-lg hidden transition flex items-center justify-center gap-1 min-w-[120px]">
+                                Finalizar & Entrar <i class="fa-solid fa-check ml-1"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contenido Principal -->
+        <section id="screen-main" class="view-screen flex-grow flex flex-col">
+            <nav class="glass-nav sticky top-0 z-40 px-3.5 py-3 text-white">
+                <div class="max-w-7xl mx-auto flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <img src="data:image/webp;base64,UklGRtQFAABXRUJQVlA4IMgFAAAwJACdASrnAHcAPm00l0gkIyIhJRNqYIANiWNu8oxb/EYAWYB+gGk4gC0OVP3o376m9tB5iPOQ/z3qy8mbrS96Xrxb7x0eAW86x8xw87AG/QwT0t00XykZtFSbHZz2dEbmHzZrGv9yCWKpzntCpVo1B+h8F6C4yhfFODWEDTbWznGnyKgDgnu6vhTIqg59rvxRAjUqKKyFNCd4moyjKfu0v75OlpDJMdSvVhdx9nRjKTmcnRNRlCy+1TbUo8AcNttm+VZ7BzrH8xz8ARnjTrnC42H3HK/tVHY3Jh9d4mpdHQ885qDthRPG3+cUa6GDr3RonKQOZFhLlAlYHNzi58PqzXvGKkajMIv5FWEU9jQ/IE4zooqKsIn7aJ+nsbp/HOiRHkwM4yGb234QAP78Ss7vov/YD0n4C+5ZLvkXDEYW5YHdtxY5QpkRpg84eeC0knF2iuVU+gHKOm6pzFTySLF+4ZIOHxLn3sCgfK1zEVw+Y6EG93nf4Q53DqhX8Y6jPQX1ePKhP3G9d7xVR8tyPy+3kyy+mObcp3D4tGT9nLCYIiT9nLG6AIZt8H4alszG3WPbkwNgtdPFe9btpAfxQOWjAsYWH1MTPFiAZdw///kV/XhZN7xp66pMnHAP2ZcC6MY5xhqkt7qWJCcM/NxJs4evfbOtawFk4nveybVSu06JoFJcdkjfKKOzhDd2l8SmVHJIc2z707rk1Fkt8IdbESDwsQ7QN1sJ05VvmbAfkjB3OfV5W9lfRXGn94125EFePN2EBwD8SCQ+AFrmBir66570VfQDYWcbuzTGCY0jFKKQklGGF0kW8Ku2uKWmwvg9TWJQx5TR5vTwgQFaNAvzuP90HpZxO37nBqj+DlClt/1eZSnjv4y/v1agdQtj5Uo1+3lpX6wi1pu8j9w26GOrCRXL/piryeijgNhId1zDhBaqyljA5FKYMiUWnfApQFskaQz4XebnkTk+uOlQ1KksXSxD9rN7C69BtWkTbj1WX/u/VaMbgF/GVbsoxLqH+KRMlRRZwlIH2Blx/3qGtiTuKtdsvtD3d4yKel/Hryi+12qVtSMbMJZjPIV3bW3sJ+NwLI6eXOELVdknAusouFzylv5te2bBkmmKKwIXC3DAX8ARB7hqZ1B7+LCJPwplE/ZR0zTH4+ZwK3v1du9+OBG1l+v6BwKADilr7W15pLbSIuW8GzVgWYStC/Ix+zOJW1CzGPnIc8CWyhjADkF3NGMDeh8hlk092ZUjfKcwJ3+YZG3J8KTvDRXqmHzIDbjL225QURQxsAhFUON5evxUO/Eu4Xn/QrapXe9TrioMoGKedsEpnbiXbF4X6Rk2iCY+yZT1tDMqIY3Sj8zx5AfxjipskSbU4yqRMk/QfzCvKufPxf+jKOBzySF4xSETTYV3uzqzvac/abbs5wbhTiNFNMjmP0Kx7/Z6ka01GBJgOGGhH1ptSB+cpeJqHO/yaHGob5J8WrD6C4WvdMpRcbnMybwIVls0v47EfFCVz32KjkzwesaCiuv85AuHWat5J+Bw13f0FjpBntnSU4mTWCWbnUxokbQc9br/rvHOB5befYdr/zwYLGwvFDeX52D/4SBW7yYHW4aHDJna5q3HHQMCHJQtsSJsxWghUyzd0ZUCKgYAcpQMK/V1eXPUt/CJ4f2R6z1BW55ccr/pplWxOlm6GA9h77tzeEb4aD7foNhWeFLRV4V7mOdEt9PTIrxFvbfT35//BeQqgabbT87LZyGr1JmiWHEHJWH13ymsA/ideQ603tN3oFPGF0NnbtOVTqdd44Q5Bk7nHeVYkHMIoVBlT6xmT70M/hlwik2/9Q1uRTM/KA8WENjV8Nofav/CpvLzrq9h7Q/KWpWLUP6RCDA8A6mUSYAmmP5aoVRnMz+rFAgg7lNlHU4OH13zmzV9E/sUgUH99xourqmnVM4Z9NUAnzJvet6af4LHKGeMt20D3I74RkiKL+uTfOt+QAAA" alt="ETec" class="w-9 h-9 rounded-xl object-contain bg-white shadow-md">
+                        <div>
+                            <span class="font-extrabold text-white tracking-tight block text-sm leading-none">VitaPet</span>
+                            <span class="text-[9px] text-slate-300 font-medium">Registro de Hábitos</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <select id="languageSelect" onchange="changeLanguage(this.value)" aria-label="Idioma" class="text-[10px] bg-white/10 text-white border border-white/20 rounded-xl px-2 py-1.5 font-bold">
+                            <option value="es">ES</option><option value="en">EN</option><option value="pt">PT</option>
+                        </select>
+                        <button onclick="openPetCustomizer()" class="text-xs bg-indigo-500/20 text-indigo-100 active:bg-indigo-500/40 px-3 py-1.5 rounded-xl border border-indigo-400/30 font-semibold transition flex items-center gap-1">
+                            <i class="fa-solid fa-palette"></i><span>Personalizar</span>
+                        </button>
+                        <button onclick="logout()" class="text-xs bg-rose-500/20 text-rose-200 active:bg-rose-500/40 px-3 py-1.5 rounded-xl border border-rose-500/30 font-semibold transition flex items-center gap-1">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span>Salir</span>
+                    </button>
+                </div>
+            </nav>
+
+            <main class="flex-grow max-w-7xl w-full mx-auto p-3.5 sm:p-6 space-y-4">
+                <div class="glass-card-dark rounded-3xl p-4 sm:p-5 shadow-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-extrabold text-white">¡Bienvenido/a a VitaPet!</h2>
+                        <p class="text-slate-300 text-[11px] mt-0.5">Estadísticas y plan diario adaptado.</p>
+                    </div>
+                    <div class="flex items-center gap-1.5 bg-emerald-500/20 text-emerald-300 px-3 py-1.5 rounded-xl border border-emerald-500/30 text-xs font-bold self-start sm:self-auto">
+                        <i class="fa-solid fa-shield-heart text-xs"></i>
+                        <span id="globalHealthBadge">Mascota Saludable</span>
+                    </div>
+                </div>
+
+                <!-- Selector de secciones: control segmentado (oculto en móvil; allí se usa la barra inferior) -->
+                <div class="hidden md:block">
+                    <div class="seg" id="mainTabSelector" role="radiogroup" aria-label="Secciones de la app">
+                        <span class="seg__pill" aria-hidden="true"></span>
+
+                        <button type="button" class="seg__btn" role="radio" aria-checked="true" tabindex="0" data-value="tab-dashboard" data-color="#2563eb">
+                            <i class="fa-solid fa-chart-pie seg__icon" aria-hidden="true"></i>
+                            <span>General & Mascota</span>
+                        </button>
+
+                        <button type="button" class="seg__btn" role="radio" aria-checked="false" tabindex="-1" data-value="tab-nutrition" data-color="#059669">
+                            <i class="fa-solid fa-utensils seg__icon" aria-hidden="true"></i>
+                            <span>Alimentación</span>
+                        </button>
+
+                        <button type="button" class="seg__btn" role="radio" aria-checked="false" tabindex="-1" data-value="tab-fitness" data-color="#ea580c">
+                            <i class="fa-solid fa-dumbbell seg__icon" aria-hidden="true"></i>
+                            <span>Ejercicios</span>
+                        </button>
+
+                        <button type="button" class="seg__btn" role="radio" aria-checked="false" tabindex="-1" data-value="tab-sleep" data-color="#7c3aed">
+                            <i class="fa-solid fa-moon seg__icon" aria-hidden="true"></i>
+                            <span>Sueño & Mente</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tab General -->
+                <div id="tab-dashboard" class="tab-content space-y-4">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        <div class="glass-card rounded-3xl p-4 sm:p-6 flex flex-col items-center justify-center text-center relative">
+                            <div class="absolute top-3 left-3 bg-brand-600 text-white text-[9px] uppercase font-extrabold px-2.5 py-0.5 rounded-full shadow-sm">
+                                Mascota Virtual
+                            </div>
+
+                            <div class="my-4 relative">
+                                <div class="w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-gradient-to-tr from-brand-600 via-brand-500 to-indigo-400 flex items-center justify-center text-white shadow-2xl animate-pet border-4 border-white/50">
+                                    <i id="petAvatarIcon" class="fa-solid fa-dog text-4xl sm:text-6xl"></i>
+                                </div>
+                                <span class="absolute bottom-0 right-0 bg-emerald-500 text-white text-xs w-7 h-7 rounded-full flex items-center justify-center border-2 border-white shadow">
+                                    <i class="fa-solid fa-smile"></i>
+                                </span>
+                            </div>
+
+                            <h3 class="text-lg font-black text-slate-800" id="petName">Koda</h3>
+                            <p class="text-xs text-slate-600 mb-3 max-w-xs" id="petStatusText">¡Me siento genial! Gracias por cuidar tu salud.</p>
+
+                            <div class="w-full space-y-2.5 text-left border-t border-slate-300/60 pt-3">
+                                <div>
+                                    <div class="flex justify-between text-xs font-bold mb-1 text-slate-700">
+                                        <span><i class="fa-solid fa-heart text-rose-500 mr-1"></i> Salud</span>
+                                        <span id="valHealth">85%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-300/80 h-2 rounded-full overflow-hidden">
+                                        <div id="barHealth" class="bg-rose-500 h-full rounded-full transition-all duration-500" style="width: 85%;"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-xs font-bold mb-1 text-slate-700">
+                                        <span><i class="fa-solid fa-bolt text-amber-500 mr-1"></i> Energía</span>
+                                        <span id="valEnergy">70%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-300/80 h-2 rounded-full overflow-hidden">
+                                        <div id="barEnergy" class="bg-amber-500 h-full rounded-full transition-all duration-500" style="width: 70%;"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-xs font-bold mb-1 text-slate-700">
+                                        <span><i class="fa-solid fa-face-smile text-sky-500 mr-1"></i> Ánimo</span>
+                                        <span id="valMood">90%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-300/80 h-2 rounded-full overflow-hidden">
+                                        <div id="barMood" class="bg-sky-500 h-full rounded-full transition-all duration-500" style="width: 90%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass-card rounded-3xl p-4 sm:p-6 lg:col-span-2 flex flex-col justify-between space-y-4">
+                            <!-- TARJETA DE RACHA CORREGIDA Y OPTIMIZADA PARA MÓVIL -->
+                            <div class="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 rounded-2xl p-3.5 text-white shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3 overflow-hidden">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-xl shadow-inner shrink-0">
+                                        <i class="fa-solid fa-fire text-amber-200"></i>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <p class="text-[9px] uppercase font-black tracking-wider text-amber-100">Racha de Ejercicio</p>
+                                        <h4 class="text-base sm:text-lg font-black flex items-center gap-1 leading-none mt-0.5 truncate">
+                                            <span id="streakDaysCount">0</span> Días Consecutivos
+                                        </h4>
+                                        <p class="text-[10px] text-amber-100 mt-0.5 font-medium truncate" id="streakMessage">Registra tu entrenamiento hoy para sumar días.</p>
+                                    </div>
+                                </div>
+                                <button onclick="switchTab('tab-fitness')" class="w-full sm:w-auto bg-white text-orange-600 font-extrabold text-xs px-3 py-2 rounded-xl shadow active:bg-amber-50 transition text-center shrink-0">
+                                    + Registrar
+                                </button>
+                            </div>
+
+                            <div>
+                                <h3 class="text-sm font-extrabold text-slate-900 mb-0.5">Perfil Saludable</h3>
+                                <p class="text-[11px] text-slate-600 mb-3">Métricas evaluadas en tu registro inicial.</p>
+
+                                <div class="grid grid-cols-2 gap-2" id="profileSummaryCards">
+                                </div>
+                            </div>
+
+                            <div class="pt-2 border-t border-slate-300/60 flex items-center justify-between text-xs text-slate-600">
+                                <span class="text-[11px]">Encuesta: <strong class="text-emerald-700 font-bold" id="statusEncuestaTexto">Completada</strong></span>
+                                <button onclick="showScreen('screen-survey')" class="text-brand-600 font-bold py-1 px-2.5 rounded-lg hover:bg-brand-500/10 active:bg-brand-500/20 text-xs transition">
+                                    Rehacer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Alimentación -->
+                <div id="tab-nutrition" class="tab-content hidden space-y-4">
+                    <div class="glass-card rounded-3xl p-4 sm:p-6">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center text-lg shadow-md shrink-0"><i class="fa-solid fa-droplet"></i></div>
+                            <div><h3 class="text-sm sm:text-base font-bold text-slate-900">Alimentación e Hidratación</h3><p class="text-[11px] text-slate-600">Registro diario, no solo resumen de encuesta.</p></div>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <div class="bg-white/80 p-4 rounded-2xl border border-slate-200">
+                                <div class="flex justify-between items-end mb-2"><div><p class="text-[9px] uppercase tracking-wider text-slate-500 font-bold">Agua de hoy</p><p class="text-2xl font-black text-emerald-600"><span id="waterCount">0</span> / <span id="waterGoal">8</span> vasos</p></div><span id="waterPercent" class="text-xs font-bold text-slate-600">0%</span></div>
+                                <div class="h-3 rounded-full bg-slate-200 overflow-hidden"><div id="waterBar" class="h-full bg-emerald-500 rounded-full transition-all" style="width:0%"></div></div>
+                                <div class="grid grid-cols-2 gap-2 mt-3"><button onclick="addWater(1)" class="py-3 rounded-xl bg-emerald-600 text-white font-extrabold text-sm active:scale-95">+1 vaso</button><button onclick="removeWater(1)" class="py-3 rounded-xl bg-slate-100 text-slate-700 font-bold text-sm border border-slate-200">−1</button></div>
+                                <button onclick="resetWaterToday()" class="w-full mt-2 py-2 text-[10px] font-bold text-slate-500">Reiniciar registro de hoy</button>
+                            </div>
+                            <div class="bg-white/80 p-4 rounded-2xl border border-slate-200">
+                                <h4 class="text-xs font-extrabold text-slate-800 mb-2">Plan de mejora progresiva</h4>
+                                <p id="nutritionGoalText" class="text-xs text-slate-700 leading-relaxed">Completá la encuesta para generar una meta personalizada.</p>
+                                <div class="mt-3 flex items-center gap-2"><span class="text-[10px] font-bold text-slate-500">Progreso semanal</span><div class="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden"><div id="nutritionGoalBar" class="h-full bg-emerald-500" style="width:0%"></div></div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glass-card rounded-3xl p-4 sm:p-6">
+                        <h3 class="text-sm font-extrabold text-slate-900 mb-2">Comidas y preferencias</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <input id="foodLikes" type="text" placeholder="Gustos (ej. pasta, frutas...)" class="p-3 rounded-xl border border-slate-300 text-xs bg-white">
+                            <input id="foodAllergies" type="text" placeholder="Alergias / alimentos a evitar" class="p-3 rounded-xl border border-slate-300 text-xs bg-white">
+                            <select id="nutritionNeed" class="p-3 rounded-xl border border-slate-300 text-xs bg-white">
+                                <option value="equilibrada">Necesidad: alimentación equilibrada</option><option value="energia">Más energía</option><option value="rendimiento">Rendimiento deportivo</option><option value="regularidad">Mejorar regularidad</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3">
+                            <label class="text-[10px] font-bold text-slate-600">Desayuno<input id="mealBreakfast" type="time" value="08:00" class="mt-1 w-full p-2 rounded-xl border border-slate-300 text-xs bg-white"></label>
+                            <label class="text-[10px] font-bold text-slate-600">Almuerzo<input id="mealLunch" type="time" value="13:00" class="mt-1 w-full p-2 rounded-xl border border-slate-300 text-xs bg-white"></label>
+                            <label class="text-[10px] font-bold text-slate-600">Merienda<input id="mealSnack" type="time" value="17:00" class="mt-1 w-full p-2 rounded-xl border border-slate-300 text-xs bg-white"></label>
+                            <label class="text-[10px] font-bold text-slate-600">Cena<input id="mealDinner" type="time" value="21:00" class="mt-1 w-full p-2 rounded-xl border border-slate-300 text-xs bg-white"></label>
+                        </div>
+                        <button onclick="saveFoodPreferences()" class="mt-3 w-full sm:w-auto px-4 py-2.5 rounded-xl bg-brand-600 text-white text-xs font-bold">Guardar preferencias y cronograma</button>
+                        <div id="mealPlan" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 mt-3"></div>
+                    </div>
+                </div>
+
+                <!-- Tab Ejercicios -->
+                <div id="tab-fitness" class="tab-content hidden space-y-4">
+                    <div class="glass-card-dark rounded-3xl p-4 sm:p-6 shadow-xl border border-white/20">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-500 to-indigo-500 text-white flex items-center justify-center text-lg shadow-md shrink-0">
+                                <i class="fa-solid fa-list-check"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+                                    Rutinas Recomendadas
+                                </h3>
+                                <p class="text-[11px] text-slate-300">Selecciona para agregar a tu día.</p>
+                            </div>
+                        </div>
+
+                        <div id="routinesOutput" class="space-y-3">
+                            <div class="grid grid-cols-1 gap-2.5">
+                                <div class="bg-white/90 p-3 rounded-2xl border border-slate-200 text-slate-800 shadow-md">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-[9px] bg-indigo-600 text-white font-extrabold px-2 py-0.5 rounded uppercase">Fuerza</span>
+                                        <span class="text-[10px] font-bold text-indigo-700">3 días/semana</span>
+                                    </div>
+                                    <h4 class="text-xs font-black text-slate-900 mb-0.5">Rutina A: Fuerza e Hipertrofia</h4>
+                                    <p class="text-[11px] text-slate-600 leading-snug mb-2">4 Series x 12 Reps: Sentadillas, Flexiones, Peso Muerto y Remo.</p>
+                                    <button onclick="addQuickWorkout('Fuerza e Hipertrofia', 4, 12)" class="w-full py-2 bg-indigo-50 hover:bg-indigo-100 active:bg-indigo-200 text-indigo-700 text-xs font-bold rounded-xl border border-indigo-200 transition">
+                                        + Agregar al Registro de Hoy
+                                    </button>
+                                </div>
+
+                                <div class="bg-white/90 p-3 rounded-2xl border border-slate-200 text-slate-800 shadow-md">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-[9px] bg-emerald-600 text-white font-extrabold px-2 py-0.5 rounded uppercase">Cardio</span>
+                                        <span class="text-[10px] font-bold text-emerald-700">2-3 días/semana</span>
+                                    </div>
+                                    <h4 class="text-xs font-black text-slate-900 mb-0.5">Rutina B: Aeróbica & Resistencia</h4>
+                                    <p class="text-[11px] text-slate-600 leading-snug mb-2">30 min de Intervalos moderados en Carrera, Bicicleta o Caminata.</p>
+                                    <button onclick="addQuickWorkout('Cardio Aeróbico', 1, 30)" class="w-full py-2 bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 text-emerald-700 text-xs font-bold rounded-xl border border-emerald-200 transition">
+                                        + Agregar al Registro de Hoy
+                                    </button>
+                                </div>
+
+                                <div class="bg-white/90 p-3 rounded-2xl border border-slate-200 text-slate-800 shadow-md">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-[9px] bg-purple-600 text-white font-extrabold px-2 py-0.5 rounded uppercase">Movilidad</span>
+                                        <span class="text-[10px] font-bold text-purple-700">Diario / Descanso</span>
+                                    </div>
+                                    <h4 class="text-xs font-black text-slate-900 mb-0.5">Rutina C: Yoga & Flexibilidad</h4>
+                                    <p class="text-[11px] text-slate-600 leading-snug mb-2">20 min de ejercicios de estiramiento y postura lumbar.</p>
+                                    <button onclick="addQuickWorkout('Yoga & Flexibilidad', 1, 20)" class="w-full py-2 bg-purple-50 hover:bg-purple-100 active:bg-purple-200 text-purple-700 text-xs font-bold rounded-xl border border-purple-200 transition">
+                                        + Agregar al Registro de Hoy
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        <div class="glass-card rounded-3xl p-4 sm:p-6 lg:col-span-2">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-sm font-extrabold text-slate-900 capitalize" id="calendarMonthYear">Mes Año</h3>
+                                    <button onclick="goToToday()" class="text-[10px] bg-brand-600 text-white font-bold px-2 py-0.5 rounded-lg active:bg-brand-700 transition">
+                                        Hoy
+                                    </button>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <button onclick="navigateMonth(-1)" class="w-7 h-7 rounded-lg bg-white/80 border border-slate-300 flex items-center justify-center text-slate-700 active:scale-95 transition">
+                                        <i class="fa-solid fa-chevron-left text-xs"></i>
+                                    </button>
+                                    <button onclick="navigateMonth(1)" class="w-7 h-7 rounded-lg bg-white/80 border border-slate-300 flex items-center justify-center text-slate-700 active:scale-95 transition">
+                                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-7 gap-1 text-center font-bold text-[10px] text-slate-500 mb-1.5">
+                                <div>Lu</div>
+                                <div>Ma</div>
+                                <div>Mi</div>
+                                <div>Ju</div>
+                                <div>Vi</div>
+                                <div>Sá</div>
+                                <div>Do</div>
+                            </div>
+
+                            <div class="grid grid-cols-7 gap-1" id="calendarGrid">
+                            </div>
+                        </div>
+
+                        <div class="glass-card rounded-3xl p-4 sm:p-6 flex flex-col justify-between space-y-3">
+                            <div>
+                                <div class="border-b border-slate-300 pb-2.5 mb-3 flex justify-between items-start">
+                                    <div>
+                                        <span class="text-[9px] uppercase font-extrabold text-brand-600 tracking-wider">Detalles del Día</span>
+                                        <h3 class="text-xs font-extrabold text-slate-900 truncate max-w-[160px]" id="selectedDateTitle">Cargando fecha...</h3>
+                                    </div>
+                                    <div class="bg-amber-500/10 text-amber-700 px-2 py-0.5 rounded-lg border border-amber-500/20 text-[10px] font-extrabold flex items-center gap-1">
+                                        <i class="fa-solid fa-fire text-amber-500"></i>
+                                        <span id="fitnessTabStreakVal">Racha: 0d</span>
+                                    </div>
+                                </div>
+
+                                <form id="fitnessWorkoutForm" onsubmit="handleFitnessWorkoutSubmit(event)" class="bg-white/80 p-3 rounded-2xl border border-slate-200/80 shadow-sm space-y-2.5 mb-3">
+                                    <div class="flex justify-between items-center border-b border-slate-200 pb-1.5">
+                                        <span class="text-xs font-bold text-slate-800">Añadir Ejercicio</span>
+                                        <input type="date" id="fitnessDateInput" required class="p-1 rounded-lg border border-slate-300 text-[11px] font-bold text-brand-600 bg-white">
+                                    </div>
+
+                                    <div class="grid grid-cols-1 gap-2">
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-slate-700 mb-1">Ubicación</label>
+                                            <div class="grid grid-cols-2 gap-1.5">
+                                                <label class="option-btn !min-h-[32px] !py-0.5 !px-2 !text-[11px]">
+                                                    <input type="radio" name="fitnessLocation" value="Gimnasio" checked> Gym
+                                                </label>
+                                                <label class="option-btn !min-h-[32px] !py-0.5 !px-2 !text-[11px]">
+                                                    <input type="radio" name="fitnessLocation" value="Casa"> Casa
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-slate-700 mb-0.5">Nombre Ejercicio</label>
+                                            <input type="text" id="fitnessWorkoutName" placeholder="Ej: Sentadillas, Flexiones" required class="w-full p-2 rounded-xl border border-slate-300 text-xs bg-white font-medium">
+                                        </div>
+                                    </div>
+
+                                    <label class="flex items-center gap-2 text-[10px] font-bold text-slate-700 bg-slate-50 p-2 rounded-xl border border-slate-200"><input type="checkbox" id="fitnessCompleted" class="w-4 h-4 accent-brand-600"> Rutina completa</label>
+                                    <div class="grid grid-cols-3 gap-1.5">
+                                        <div>
+                                            <label class="block text-[9px] font-bold text-slate-700 mb-0.5">Series</label>
+                                            <input type="number" id="fitnessWorkoutSets" min="1" placeholder="4" class="w-full p-1.5 rounded-xl border border-slate-300 text-xs bg-white text-center font-bold">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[9px] font-bold text-slate-700 mb-0.5">Reps</label>
+                                            <input type="number" id="fitnessWorkoutReps" min="1" placeholder="12" class="w-full p-1.5 rounded-xl border border-slate-300 text-xs bg-white text-center font-bold">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[9px] font-bold text-slate-700 mb-0.5">Peso (kg)</label>
+                                            <input type="number" id="fitnessWorkoutWeight" step="0.5" placeholder="20" class="w-full p-1.5 rounded-xl border border-slate-300 text-xs bg-white text-center font-bold">
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="w-full py-2 bg-gradient-to-r from-indigo-600 to-brand-600 active:from-indigo-700 text-white font-extrabold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5">
+                                        <i class="fa-solid fa-plus-circle"></i> Registrar
+                                    </button>
+                                </form>
+
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-800 mb-1.5 flex justify-between items-center">
+                                        <span>Registros de este día</span>
+                                        <span class="bg-white/80 px-2 py-0.5 rounded text-[10px] font-extrabold" id="dayLogsCount">0</span>
+                                    </h4>
+                                    <div class="space-y-1.5 max-h-[160px] overflow-y-auto pr-0.5" id="dayWorkoutLogsList">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Tab Sueño -->
+                <div id="tab-sleep" class="tab-content hidden space-y-4">
+                    <div class="glass-card rounded-3xl p-4 sm:p-6">
+                        <div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 rounded-2xl bg-violet-600 text-white flex items-center justify-center text-lg shadow-md"><i class="fa-solid fa-moon"></i></div><div><h3 class="text-sm sm:text-base font-bold text-slate-900">Sueño & Mente</h3><p class="text-[11px] text-slate-600">Registro diario estilo seguimiento de sueño.</p></div></div>
+                        <form id="sleepLogForm" onsubmit="saveSleepLog(event)" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                            <div><label class="text-[10px] font-bold text-slate-600">Fecha</label><input id="sleepDate" type="date" required class="w-full p-2.5 rounded-xl border border-slate-300 text-xs"></div>
+                            <div><label class="text-[10px] font-bold text-slate-600">Me acosté</label><input id="sleepStart" type="time" required class="w-full p-2.5 rounded-xl border border-slate-300 text-xs"></div>
+                            <div><label class="text-[10px] font-bold text-slate-600">Me levanté</label><input id="sleepEnd" type="time" required class="w-full p-2.5 rounded-xl border border-slate-300 text-xs"></div>
+                            <div><label class="text-[10px] font-bold text-slate-600">Calidad (1-10)</label><input id="sleepQualityInput" type="number" min="1" max="10" value="7" required class="w-full p-2.5 rounded-xl border border-slate-300 text-xs"></div>
+                            <button class="col-span-2 sm:col-span-4 py-3 rounded-xl bg-violet-600 text-white font-extrabold text-xs">Guardar noche</button>
+                        </form>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div class="glass-card rounded-3xl p-4 sm:p-6"><div class="flex justify-between items-center mb-3"><h3 class="text-sm font-extrabold text-slate-900">Últimos 7 días</h3><span id="sleepAverage" class="text-xs font-bold text-violet-600">Promedio: —</span></div><div id="sleepChart" class="grid grid-cols-7 gap-1 items-end h-40"></div><div id="sleepHistory" class="mt-3 space-y-1"></div></div>
+                        <div class="glass-card rounded-3xl p-4 sm:p-6 space-y-4">
+                            <div class="border-t border-slate-200 pt-3"><h3 class="text-sm font-extrabold text-slate-900 mb-2">Alarma</h3><div class="flex gap-2"><input id="alarmTime" type="time" class="flex-1 p-2.5 rounded-xl border border-slate-300 text-xs"><button onclick="setAlarm()" class="px-4 rounded-xl bg-amber-500 text-white text-xs font-bold">Activar</button></div><p id="alarmStatus" class="text-[10px] text-slate-500 mt-1">Sin alarma activa.</p></div>
+                            <div class="border-t border-slate-200 pt-3">
+                                <h3 class="text-sm font-extrabold text-slate-900 mb-2">Meditación</h3>
+                                <div class="flex gap-2"><select id="meditationMinutes" class="flex-1 p-2.5 rounded-xl border border-slate-300 text-xs"><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option></select><button onclick="startMeditation()" class="px-4 rounded-xl bg-violet-600 text-white text-xs font-bold">Iniciar</button></div>
+                                <div id="meditationTimer" class="text-center text-2xl font-black text-violet-600 mt-2">05:00</div><p id="meditationStatus" class="text-[10px] text-slate-500 text-center">Respirá lento y mantené la atención.</p>
+                            </div>
+                            <div class="border-t border-slate-200 pt-3">
+                                <h3 class="text-sm font-extrabold text-slate-900 mb-2">Desintoxicación</h3>
+                                <label class="text-[10px] font-bold text-slate-600 block mb-2">Objetivo de detox<select id="detoxType" class="mt-1 w-full p-2 rounded-xl border border-slate-300 text-xs"><option value="celular">Reducir uso del celular</option><option value="alcohol">Evitar alcohol</option><option value="tabaco">Dejar/reducir tabaco</option><option value="drogas">Evitar consumo de drogas</option></select></label>
+                                <label class="flex items-center gap-2 text-xs font-bold"><input id="detoxToday" type="checkbox" onchange="toggleDetoxToday(this.checked)" class="w-4 h-4 accent-emerald-600"> Cumplí 30 minutos de detox hoy</label>
+                                <p id="detoxStreak" class="text-[10px] text-emerald-700 font-bold mt-1">Racha: 0 días</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glass-card rounded-3xl p-4 sm:p-6"><h3 class="text-sm font-extrabold text-slate-900 mb-2">Resumen</h3><div class="grid grid-cols-2 sm:grid-cols-4 gap-2"><div class="bg-white/80 p-3 rounded-2xl border border-slate-200"><p class="text-[9px] uppercase text-slate-500 font-bold">Encuesta</p><p id="sleepHours" class="text-base font-extrabold text-sky-600">—</p></div><div class="bg-white/80 p-3 rounded-2xl border border-slate-200"><p class="text-[9px] uppercase text-slate-500 font-bold">Calidad</p><p id="sleepQuality" class="text-base font-extrabold text-emerald-600">—</p></div><div class="bg-white/80 p-3 rounded-2xl border border-slate-200"><p class="text-[9px] uppercase text-slate-500 font-bold">Estrés</p><p id="sleepStress" class="text-base font-extrabold text-rose-600">—</p></div><div class="bg-white/80 p-3 rounded-2xl border border-slate-200"><p class="text-[9px] uppercase text-slate-500 font-bold">Detox</p><p id="sleepDetox" class="text-base font-extrabold text-brand-600">—</p></div></div><div class="mt-3 bg-slate-900/5 p-3.5 rounded-2xl border border-slate-200"><p id="sleepTipText" class="text-xs text-slate-700 leading-relaxed">Registrá tu primera noche para empezar el gráfico semanal.</p></div></div>
+                </div>
+
+                <div class="glass-card rounded-3xl p-4 sm:p-5 border border-amber-300/60">
+                    <div class="flex gap-3"><i class="fa-solid fa-circle-info text-amber-600 mt-0.5"></i><p class="text-[10px] sm:text-xs text-slate-700 leading-relaxed"><strong>Aviso importante:</strong> VitaPet es una herramienta educativa y de acompañamiento. No reemplaza a profesionales de la salud ni constituye diagnóstico o tratamiento. Si necesitás ayuda con una adicción, alimentación, sueño o salud mental, buscá orientación profesional y servicios de tu localidad.</p></div>
+                </div>
+
+            </main>
+        </section>
+
+        <div id="petCustomizerModal" class="fixed inset-0 z-[80] hidden items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
+            <div class="glass-card rounded-3xl p-5 w-full max-w-md shadow-2xl">
+                <div class="flex items-center justify-between mb-4"><h3 class="text-base font-black">Personalizar mascota</h3><button onclick="closePetCustomizer()" class="w-8 h-8 rounded-full bg-slate-100">✕</button></div>
+                <div class="grid grid-cols-2 gap-3">
+                    <label class="text-xs font-bold">Nombre<input id="petNameInput" class="mt-1 w-full p-2.5 rounded-xl border border-slate-300" maxlength="20"></label>
+                    <label class="text-xs font-bold">Tipo<select id="petTypeInput" class="mt-1 w-full p-2.5 rounded-xl border border-slate-300"><option value="dog">Perro</option><option value="cat">Gato</option><option value="rabbit">Conejo</option><option value="fox">Zorro</option><option value="dragon">Dragón</option></select></label>
+                    <label class="text-xs font-bold">Color<select id="petColorInput" class="mt-1 w-full p-2.5 rounded-xl border border-slate-300"><option value="blue">Azul</option><option value="green">Verde</option><option value="purple">Violeta</option><option value="orange">Naranja</option><option value="pink">Rosa</option></select></label>
+                    <label class="text-xs font-bold">Accesorio<select id="petAccessoryInput" class="mt-1 w-full p-2.5 rounded-xl border border-slate-300"><option value="none">Ninguno</option><option value="star">⭐ Estrella</option><option value="heart">❤️ Corazón</option><option value="crown">👑 Corona</option><option value="leaf">🍃 Hoja</option></select></label>
+                </div>
+                <button onclick="savePetCustomization()" class="w-full mt-4 py-3 rounded-xl bg-brand-600 text-white font-extrabold text-xs">Guardar cambios</button>
+            </div>
+        </div>
+
+        <!-- Navegación Inferior Móvil Fija -->
+        <nav id="bottom-nav" class="glass-bottom-bar fixed bottom-0 left-0 right-0 z-50 md:hidden hidden">
+            <div class="px-3 pt-2">
+                <div class="seg seg--bar" id="mobileTabSelector" role="radiogroup" aria-label="Secciones de la app">
+                    <span class="seg__pill" aria-hidden="true"></span>
+
+                    <button type="button" class="seg__btn" role="radio" aria-checked="true" tabindex="0" data-value="tab-dashboard" data-color="#2563eb">
+                        <i class="fa-solid fa-paw seg__icon" aria-hidden="true"></i>
+                        <span>Mascota</span>
+                    </button>
+
+                    <button type="button" class="seg__btn" role="radio" aria-checked="false" tabindex="-1" data-value="tab-nutrition" data-color="#059669">
+                        <i class="fa-solid fa-utensils seg__icon" aria-hidden="true"></i>
+                        <span>Comida</span>
+                    </button>
+
+                    <button type="button" class="seg__btn" role="radio" aria-checked="false" tabindex="-1" data-value="tab-fitness" data-color="#ea580c">
+                        <i class="fa-solid fa-dumbbell seg__icon" aria-hidden="true"></i>
+                        <span>Ejercicios</span>
+                    </button>
+
+                    <button type="button" class="seg__btn" role="radio" aria-checked="false" tabindex="-1" data-value="tab-sleep" data-color="#7c3aed">
+                        <i class="fa-solid fa-moon seg__icon" aria-hidden="true"></i>
+                        <span>Sueño</span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'vitapet_etec_v2';
+        let appState = { email:'', survey:{}, workouts:[], water:{}, sleep:[], food:{likes:'', allergies:'', need:'equilibrada', schedule:{breakfast:'08:00',lunch:'13:00',snack:'17:00',dinner:'21:00'}}, alarm:'', pet:{name:'Koda',type:'dog',color:'blue',accessory:'none'}, detox:{}, language:'es' };
+        let currentSurveyData = {};
+        let workoutLogs = [];
+        let sleepLogs = [];
+        let calendarCurrentDate = new Date();
+        let selectedDateStr = new Date().toISOString().split('T')[0];
+        let alarmTimer = null;
+
+        function todayISO(){ return new Date().toISOString().split('T')[0]; }
+        function saveState(){
+            appState.survey = currentSurveyData; appState.workouts = workoutLogs; appState.sleep = sleepLogs;
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(appState)); } catch(e) { console.warn('No se pudo guardar localmente', e); }
+        }
+        function loadState(){
+            try { const raw=localStorage.getItem(STORAGE_KEY); if(raw) appState={...appState,...JSON.parse(raw)}; } catch(e){}
+            currentSurveyData=appState.survey||{}; workoutLogs=Array.isArray(appState.workouts)?appState.workouts:[]; sleepLogs=Array.isArray(appState.sleep)?appState.sleep:[];
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            const t=todayISO();
+            const fit=document.getElementById('fitnessDateInput'); if(fit) fit.value=t;
+            const sd=document.getElementById('sleepDate'); if(sd) sd.value=t;
+            restoreFoodPreferences(); restorePetCustomization(); restoreDetox(); restoreLanguage();
+            if(Object.keys(currentSurveyData).length){ renderProfileSummaryCards(currentSurveyData); populateIndividualModules(currentSurveyData); adaptPetStats(currentSurveyData); }
+            renderCalendar(); updateSelectedDateView(); updateStreakDisplay(); renderWater(); renderSleepDashboard();
+            updateProgressivePlan();
+            const hasUser=!!appState.email;
+            if(hasUser && Object.keys(currentSurveyData).length){ showScreen('screen-main'); switchTab('tab-dashboard'); }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'F2' || (e.ctrlKey && e.key.toLowerCase() === 'b')) {
+                e.preventDefault();
+                saltearEncuesta();
+            }
+        });
+
+        function saltearEncuesta() {
+            const mockData = {
+                'habito/objetivo': 'alimentacion',
+                'agua': '6/8',
+                'frutas/verduras': 'diario (1 porción)',
+                'desafios/comida': 'ultraprocesados',
+                'ejercicio/frecuencia': '3/4',
+                'tipo/ejercicio': ['fuerza', 'cardio'],
+                'tiempo/sentado': '4/7',
+                'horas/sueno': '7/8',
+                'calidad/sueno': '8',
+                'despertar/fresco': 'a-veces',
+                'experiencia/meditacion': 'intentado',
+                'nivel/estres': '4',
+                'tiempo/pantallas': '1/3',
+                'pantalla/cama': 'solo-dormir',
+                'dispuesta/detox': 'si'
+            };
+
+            currentSurveyData = mockData;
+            renderProfileSummaryCards(currentSurveyData);
+            populateIndividualModules(currentSurveyData);
+            adaptPetStats(currentSurveyData);
+            saveState();
+            updateProgressivePlan();
+
+            const statusTexto = document.getElementById('statusEncuestaTexto');
+            if (statusTexto) {
+                statusTexto.innerText = 'Omitida';
+                statusTexto.className = 'text-amber-700 font-bold';
+            }
+
+            showScreen('screen-main');
+            switchTab('tab-dashboard');
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.view-screen').forEach(screen => {
+                screen.classList.remove('active', 'active-flex');
+            });
+            const target = document.getElementById(screenId);
+            const bottomNav = document.getElementById('bottom-nav');
+            const isMain = screenId === 'screen-main';
+
+            if (target) target.classList.add(isMain ? 'active' : 'active-flex');
+
+            // La barra inferior solo se muestra dentro de la aplicación.
+            // Login y encuesta quedan completamente limpios, sin pestañas de navegación.
+            if (bottomNav) {
+                bottomNav.classList.toggle('hidden', !isMain);
+                bottomNav.setAttribute('aria-hidden', String(!isMain));
+            }
+            document.body.classList.toggle('app-auth-view', !isMain);
+            document.body.classList.toggle('app-main-view', isMain);
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function handleAuthSubmit(e) {
+            e.preventDefault();
+            appState.email = document.getElementById('auth-email').value.trim();
+            saveState();
+            if(Object.keys(currentSurveyData).length){ showScreen('screen-main'); switchTab('tab-dashboard'); } else { showScreen('screen-survey'); updateSurveyUI(); }
+        }
+
+        function logout() {
+            if(confirm('¿Cerrar esta sesión en este dispositivo? Tus datos guardados no se borrarán.')) showScreen('screen-auth');
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('text-slate-200');
+            });
+
+            document.querySelectorAll('.bottom-nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            document.getElementById(tabId).classList.remove('hidden');
+
+            const activeDesktopBtn = document.getElementById(`btn-${tabId}`);
+            if (activeDesktopBtn) {
+                activeDesktopBtn.classList.add('active');
+                activeDesktopBtn.classList.remove('text-slate-200');
+            }
+
+            const activeBottomBtn = document.getElementById(`bnav-${tabId}`);
+            if (activeBottomBtn) {
+                activeBottomBtn.classList.add('active');
+            }
+
+            if (window.syncMainTabSelector) window.syncMainTabSelector(tabId);
+
+            if (tabId === 'tab-fitness') {
+                renderCalendar();
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        let currentSurveyStep = 1;
+        const totalSurveySteps = 5;
+
+        const stepNames = ["Alimentación", "Ejercicio", "Sueño", "Meditación", "Detox Digital"];
+
+        function addWater(amount){ const d=todayISO(); appState.water=appState.water||{}; appState.water[d]=Math.max(0,Math.min(30,(appState.water[d]||0)+amount)); saveState(); renderWater(); adaptPetStats(currentSurveyData); }
+        function removeWater(amount){ addWater(-amount); }
+        function resetWaterToday(){ if(confirm('¿Reiniciar el agua registrada hoy?')){ appState.water=appState.water||{}; appState.water[todayISO()]=0; saveState(); renderWater(); adaptPetStats(currentSurveyData); } }
+        function renderWater(){ const count=(appState.water&&appState.water[todayISO()])||0; const surveyGoal=(currentSurveyData.agua==='menos-3'?8:currentSurveyData.agua==='3/5'?8:currentSurveyData.agua==='mas-8'?10:8); const goal=surveyGoal; const pct=Math.min(100,Math.round(count/goal*100)); ['waterCount','waterGoal','waterPercent','waterBar'].forEach(id=>{if(!document.getElementById(id))return}); document.getElementById('waterCount').innerText=count; document.getElementById('waterGoal').innerText=goal; document.getElementById('waterPercent').innerText=pct+'%'; document.getElementById('waterBar').style.width=pct+'%'; }
+        function saveFoodPreferences(){ appState.food={likes:document.getElementById('foodLikes').value.trim(),allergies:document.getElementById('foodAllergies').value.trim(),need:document.getElementById('nutritionNeed').value,schedule:{breakfast:document.getElementById('mealBreakfast').value,lunch:document.getElementById('mealLunch').value,snack:document.getElementById('mealSnack').value,dinner:document.getElementById('mealDinner').value}}; saveState(); renderMealPlan(); alert('Preferencias y cronograma guardados en este dispositivo.'); }
+        function restoreFoodPreferences(){ if(document.getElementById('foodLikes')){document.getElementById('foodLikes').value=appState.food?.likes||'';document.getElementById('foodAllergies').value=appState.food?.allergies||'';document.getElementById('nutritionNeed').value=appState.food?.need||'equilibrada';const sc=appState.food?.schedule||{};document.getElementById('mealBreakfast').value=sc.breakfast||'08:00';document.getElementById('mealLunch').value=sc.lunch||'13:00';document.getElementById('mealSnack').value=sc.snack||'17:00';document.getElementById('mealDinner').value=sc.dinner||'21:00';} renderMealPlan(); }
+        function renderMealPlan(){ const el=document.getElementById('mealPlan'); if(!el)return; const likes=appState.food?.likes; const allergy=appState.food?.allergies; const need=appState.food?.need||'equilibrada'; const sc=appState.food?.schedule||{}; const note=allergy?` Evitá: ${allergy}.`:''; const base=need==='energia'?'Incluí una fuente de energía y proteína.':need==='rendimiento'?'Priorizá carbohidratos, proteína y buena hidratación.':need==='regularidad'?'Priorizá horarios constantes y alimentos simples.':'Buscá variedad de frutas, verduras, proteínas y cereales.'; const meals=[['Desayuno','breakfast','Fruta + yogur/avena + agua'],['Almuerzo','lunch','Verduras + proteína + cereal/tubérculo'],['Merienda','snack','Fruta o colación simple + agua'],['Cena','dinner','Verduras + proteína + acompañamiento']]; el.innerHTML=meals.map(([a,k,b])=>`<div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100"><p class="text-[9px] uppercase font-black text-emerald-700">${a} · ${sc[k]||'—'}</p><p class="text-[10px] font-semibold text-slate-700 mt-1">${b} ${base}${likes?' Preferencia: '+likes+'.':''}${note}</p></div>`).join(''); }
+        function openPetCustomizer(){const m=document.getElementById('petCustomizerModal'); if(!m)return; document.getElementById('petNameInput').value=appState.pet?.name||'Koda';document.getElementById('petTypeInput').value=appState.pet?.type||'dog';document.getElementById('petColorInput').value=appState.pet?.color||'blue';document.getElementById('petAccessoryInput').value=appState.pet?.accessory||'none';m.classList.remove('hidden');m.classList.add('flex');}
+        function closePetCustomizer(){const m=document.getElementById('petCustomizerModal');if(m){m.classList.add('hidden');m.classList.remove('flex');}}
+        function savePetCustomization(){appState.pet={name:document.getElementById('petNameInput').value.trim()||'Koda',type:document.getElementById('petTypeInput').value,color:document.getElementById('petColorInput').value,accessory:document.getElementById('petAccessoryInput').value};saveState();applyPetCustomization();closePetCustomizer();}
+        function restorePetCustomization(){appState.pet={...{name:'Koda',type:'dog',color:'blue',accessory:'none'},...(appState.pet||{})};applyPetCustomization();}
+        function applyPetCustomization(){const p=appState.pet||{};const icon=document.getElementById('petAvatarIcon');const name=document.getElementById('petName');if(name)name.innerText=p.name||'Koda';if(icon){const map={dog:'dog',cat:'cat',rabbit:'rabbit',fox:'fox',dragon:'dragon'};icon.className='fa-solid fa-'+(map[p.type]||'dog')+' text-4xl sm:text-6xl';}const wrap=icon?.parentElement;if(wrap){const colors={blue:'from-blue-600 via-sky-500 to-indigo-400',green:'from-emerald-600 via-green-500 to-lime-400',purple:'from-violet-600 via-purple-500 to-fuchsia-400',orange:'from-orange-600 via-amber-500 to-yellow-400',pink:'from-pink-600 via-rose-500 to-fuchsia-400'};wrap.className='relative w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-gradient-to-tr '+(colors[p.color]||colors.blue)+' flex items-center justify-center text-white shadow-2xl animate-pet border-4 border-white/50';let badge=wrap.querySelector('.pet-accessory');if(!badge){badge=document.createElement('span');badge.className='pet-accessory absolute -top-1 -right-1 text-xl';wrap.appendChild(badge);}badge.textContent=p.accessory==='none'?'':({star:'⭐',heart:'❤️',crown:'👑',leaf:'🍃'}[p.accessory]||'');}}
+        function restoreDetox(){const raw=appState.detox?.[todayISO()]||false;const d=typeof raw==='object'?raw.done:raw;const el=document.getElementById('detoxToday');if(el)el.checked=!!d;const type=document.getElementById('detoxType');if(type&&typeof raw==='object')type.value=raw.type||'celular';renderDetoxStreak();}
+        function toggleDetoxToday(v){appState.detox=appState.detox||{};appState.detox[todayISO()]={done:v,type:document.getElementById('detoxType')?.value||'celular'};saveState();renderDetoxStreak();adaptPetStats(currentSurveyData);}
+        function renderDetoxStreak(){let streak=0;for(let i=0;i<365;i++){const d=new Date();d.setDate(d.getDate()-i);const v=appState.detox?.[d.toISOString().split('T')[0]]; if(v && (typeof v==='boolean'?v:v.done))streak++;else break;}const el=document.getElementById('detoxStreak');if(el)el.innerText='Racha: '+streak+' días';}
+        let meditationTimerId=null, meditationRemaining=300;
+        function startMeditation(){if(meditationTimerId)clearInterval(meditationTimerId);const mins=Number(document.getElementById('meditationMinutes').value||5);meditationRemaining=mins*60;const out=document.getElementById('meditationTimer');const status=document.getElementById('meditationStatus');function tick(){const m=String(Math.floor(meditationRemaining/60)).padStart(2,'0'),s=String(meditationRemaining%60).padStart(2,'0');out.innerText=m+':'+s;if(meditationRemaining<=0){clearInterval(meditationTimerId);meditationTimerId=null;status.innerText='Meditación completada. ¡Buen trabajo!';return;}status.innerText=(meditationRemaining%8<4)?'Inspirá lentamente…':'Exhalá y relajá el cuerpo…';meditationRemaining--;}tick();meditationTimerId=setInterval(tick,1000);}
+        const I18N = {
+            es: {
+                "VitaPet - Hábitos Saludables & Mascota Virtual":"VitaPet - Hábitos Saludables & Mascota Virtual",
+                "Sección de Autenticación":"Sección de Autenticación","Proyecto de Biología · ETec":"Proyecto de Biología · ETec","Mascota Virtual & Hábitos Saludables":"Mascota Virtual & Hábitos Saludables",
+                "Correo Electrónico":"Correo Electrónico","Contraseña":"Contraseña","Ingresar":"Ingresar","Sección de la Encuesta":"Sección de la Encuesta","Paso":"Paso","de 5":"de 5",
+                "Alimentación":"Alimentación","Ejercicio":"Ejercicio","Sueño":"Sueño","¿Qué hábito de los 3 estudiados querés mejorar primero?":"¿Qué hábito de los 3 estudiados querés mejorar primero?",
+                "1. Alimentación e Hidratación":"1. Alimentación e Hidratación","Cuéntanos cómo te nutres día a día.":"Cuéntanos cómo te nutres día a día.","¿Cuántos vasos de agua consumes al día aproximadamente?":"¿Cuántos vasos de agua consumes al día aproximadamente?",
+                "Menos de 3 vasos":"Menos de 3 vasos","Entre 3 y 5 vasos":"Entre 3 y 5 vasos","Entre 6 y 8 vasos":"Entre 6 y 8 vasos","Más de 8 vasos":"Más de 8 vasos",
+                "¿Con qué frecuencia incluyes frutas y verduras?":"¿Con qué frecuencia incluyes frutas y verduras?","Selecciona una opción":"Selecciona una opción","Rara vez o nunca":"Rara vez o nunca","1 o 2 veces por semana":"1 o 2 veces por semana","Todos los días (al menos 1 porción)":"Todos los días (al menos 1 porción)","Todos los días (múltiples porciones)":"Todos los días (múltiples porciones)",
+                "¿Cuál es tu principal desafío alimenticio?":"¿Cuál es tu principal desafío alimenticio?","Consumo de ultraprocesados":"Consumo de ultraprocesados","Horarios irregulares":"Horarios irregulares","Comer por ansiedad o estrés":"Comer por ansiedad o estrés","Falta de tiempo para cocinar":"Falta de tiempo para cocinar",
+                "2. Actividad Física":"2. Actividad Física","Queremos entender cuánto mueves tu cuerpo.":"Queremos entender cuánto mueves tu cuerpo.","¿Cuántos días a la semana realizas actividad física?":"¿Cuántos días a la semana realizas actividad física?","0 días (Sedentario)":"0 días (Sedentario)","1 a 2 días":"1 a 2 días","3 a 4 días":"3 a 4 días","5 o más días":"5 o más días","¿Qué actividades prefieres?":"¿Qué actividades prefieres?","Cardio (Correr, bici, nadar)":"Cardio (Correr, bici, nadar)","Fuerza / Pesas":"Fuerza / Pesas","Caminatas / Senderismo":"Caminatas / Senderismo","Yoga / Pilates / Calistenia":"Yoga / Pilates / Calistenia","¿Cuánto tiempo pasas sentado/a al día?":"¿Cuánto tiempo pasas sentado/a al día?","Menos de 4 horas":"Menos de 4 horas","Entre 4 y 7 horas":"Entre 4 y 7 horas","Más de 8 horas":"Más de 8 horas",
+                "3. Descanso y Sueño":"3. Descanso y Sueño","Un buen descanso es la base de tu energía.":"Un buen descanso es la base de tu energía.","¿Cuántas horas duermes en promedio?":"¿Cuántas horas duermes en promedio?","Menos de 5 horas":"Menos de 5 horas","5 a 6 horas":"5 a 6 horas","7 a 8 horas":"7 a 8 horas","Calidad de tu sueño (1 al 10)":"Calidad de tu sueño (1 al 10)","7 / 10":"7 / 10","¿Sueles despertar descansado/a?":"¿Sueles despertar descansado/a?","A veces":"A veces","Casi siempre / Siempre":"Casi siempre / Siempre",
+                "4. Meditación y Enfoque":"4. Meditación y Enfoque","Tu paz mental determina tu bienestar.":"Tu paz mental determina tu bienestar.","¿Experiencia previa en meditación?":"¿Experiencia previa en meditación?","Nunca lo he probado":"Nunca lo he probado","Lo he intentado esporádicamente":"Lo he intentado esporádicamente","Practico ocasionalmente":"Practico ocasionalmente","Medito diariamente":"Medito diariamente","Nivel de estrés semanal (1 al 10)":"Nivel de estrés semanal (1 al 10)","5 / 10":"5 / 10",
+                "5. Desintoxicación Digital":"5. Desintoxicación Digital","Desconectar para volver a conectar contigo.":"Desconectar para volver a conectar contigo.","¿Tiempo diario en pantallas por ocio?":"¿Tiempo diario en pantallas por ocio?","Menos de 1 hora":"Menos de 1 hora","Entre 1 y 3 horas":"Entre 1 y 3 horas","Entre 3 y 5 horas":"Entre 3 y 5 horas","Más de 5 horas":"Más de 5 horas","¿Pantallas justo al despertar o al dormir?":"¿Pantallas justo al despertar o al dormir?","Ambos (Despertar y acostarse)":"Ambos (Despertar y acostarse)","Solo al despertar":"Solo al despertar","Solo antes de dormir":"Solo antes de dormir","Ninguno, lo evito":"Ninguno, lo evito","¿Aceptas un Detox Digital de 30 min diarios?":"¿Aceptas un Detox Digital de 30 min diarios?","Sí, totalmente":"Sí, totalmente","Tal vez, me gustaría probar":"Tal vez, me gustaría probar",
+                "Anterior":"Anterior","Siguiente":"Siguiente","Finalizar & Entrar":"Finalizar & Entrar","Contenido Principal":"Contenido Principal","Registro de Hábitos":"Registro de Hábitos","Personalizar":"Personalizar","Salir":"Salir","¡Bienvenido/a a VitaPet!":"¡Bienvenido/a a VitaPet!","Estadísticas y plan diario adaptado.":"Estadísticas y plan diario adaptado.","Mascota Saludable":"Mascota Saludable","General & Mascota":"General & Mascota","Ejercicios":"Ejercicios","Sueño & Mente":"Sueño & Mente","Mascota":"Mascota","Comida":"Comida","Alimentación e Hidratación":"Alimentación e Hidratación",
+                "Mascota Virtual":"Mascota Virtual","¡Me siento genial! Gracias por cuidar tu salud.":"¡Me siento genial! Gracias por cuidar tu salud.","Salud":"Salud","Energía":"Energía","Ánimo":"Ánimo","Racha de Ejercicio":"Racha de Ejercicio","Días Consecutivos":"Días Consecutivos","Registra tu entrenamiento hoy para sumar días.":"Registra tu entrenamiento hoy para sumar días.","+ Registrar":"+ Registrar","Perfil Saludable":"Perfil Saludable","Métricas evaluadas en tu registro inicial.":"Métricas evaluadas en tu registro inicial.","Encuesta:":"Encuesta:","Completada":"Completada","Rehacer":"Rehacer",
+                "Registro diario, no solo resumen de encuesta.":"Registro diario, no solo resumen de encuesta.","Agua de hoy":"Agua de hoy","vasos":"vasos","+1 vaso":"+1 vaso","−1":"−1","Reiniciar registro de hoy":"Reiniciar registro de hoy","Plan de mejora progresiva":"Plan de mejora progresiva","Completá la encuesta para generar una meta personalizada.":"Completá la encuesta para generar una meta personalizada.","Progreso semanal":"Progreso semanal","Comidas y preferencias":"Comidas y preferencias","Necesidad: alimentación equilibrada":"Necesidad: alimentación equilibrada","Más energía":"Más energía","Rendimiento deportivo":"Rendimiento deportivo","Mejorar regularidad":"Mejorar regularidad","Desayuno":"Desayuno","Almuerzo":"Almuerzo","Merienda":"Merienda","Cena":"Cena","Guardar preferencias y cronograma":"Guardar preferencias y cronograma",
+                "Rutinas Recomendadas":"Rutinas Recomendadas","Selecciona para agregar a tu día.":"Selecciona para agregar a tu día.","Fuerza":"Fuerza","3 días/semana":"3 días/semana","Rutina A: Fuerza e Hipertrofia":"Rutina A: Fuerza e Hipertrofia","4 Series x 12 Reps: Sentadillas, Flexiones, Peso Muerto y Remo.":"4 Series x 12 Reps: Sentadillas, Flexiones, Peso Muerto y Remo.","+ Agregar al Registro de Hoy":"+ Agregar al Registro de Hoy","Cardio":"Cardio","2-3 días/semana":"2-3 días/semana","Rutina B: Aeróbica & Resistencia":"Rutina B: Aeróbica & Resistencia","30 min de Intervalos moderados en Carrera, Bicicleta o Caminata.":"30 min de Intervalos moderados en Carrera, Bicicleta o Caminata.","Movilidad":"Movilidad","Diario / Descanso":"Diario / Descanso","Rutina C: Yoga & Flexibilidad":"Rutina C: Yoga & Flexibilidad","20 min de ejercicios de estiramiento y postura lumbar.":"20 min de ejercicios de estiramiento y postura lumbar.","Mes Año":"Mes Año","Hoy":"Hoy","Lu":"Lu","Ma":"Ma","Mi":"Mi","Ju":"Ju","Vi":"Vi","Sá":"Sá","Do":"Do","Detalles del Día":"Detalles del Día","Cargando fecha...":"Cargando fecha...","Añadir Ejercicio":"Añadir Ejercicio","Ubicación":"Ubicación","Gym":"Gym","Casa":"Casa","Nombre Ejercicio":"Nombre Ejercicio","Rutina completa":"Rutina completa","Series":"Series","Reps":"Reps","Peso (kg)":"Peso (kg)","Registrar":"Registrar","Registros de este día":"Registros de este día",
+                "Registro diario estilo seguimiento de sueño.":"Registro diario estilo seguimiento de sueño.","Fecha":"Fecha","Me acosté":"Me acosté","Me levanté":"Me levanté","Calidad (1-10)":"Calidad (1-10)","Guardar noche":"Guardar noche","Últimos 7 días":"Últimos 7 días","Promedio: —":"Promedio: —","Alarma":"Alarma","Activar":"Activar","Sin alarma activa.":"Sin alarma activa.","Meditación":"Meditación","5 min":"5 min","10 min":"10 min","15 min":"15 min","Iniciar":"Iniciar","05:00":"05:00","Respirá lento y mantené la atención.":"Respirá lento y mantené la atención.","Desintoxicación":"Desintoxicación","Objetivo de detox":"Objetivo de detox","Reducir uso del celular":"Reducir uso del celular","Evitar alcohol":"Evitar alcohol","Dejar/reducir tabaco":"Dejar/reducir tabaco","Evitar consumo de drogas":"Evitar consumo de drogas","Cumplí 30 minutos de detox hoy":"Cumplí 30 minutos de detox hoy","Racha: 0 días":"Racha: 0 días","Resumen":"Resumen","Encuesta":"Encuesta","Calidad":"Calidad","Estrés":"Estrés","Detox":"Detox","Registrá tu primera noche para empezar el gráfico semanal.":"Registrá tu primera noche para empezar el gráfico semanal.","Aviso importante:":"Aviso importante:","Personalizar mascota":"Personalizar mascota","✕":"✕","Nombre":"Nombre","Tipo":"Tipo","Perro":"Perro","Gato":"Gato","Conejo":"Conejo","Zorro":"Zorro","Dragón":"Dragón","Color":"Color","Azul":"Azul","Verde":"Verde","Violeta":"Violeta","Naranja":"Naranja","Rosa":"Rosa","Accesorio":"Accesorio","Ninguno":"Ninguno","⭐ Estrella":"⭐ Estrella","❤️ Corazón":"❤️ Corazón","👑 Corona":"👑 Corona","🍃 Hoja":"🍃 Hoja","Guardar cambios":"Guardar cambios","Navegación Inferior Móvil Fija":"Navegación Inferior Móvil Fija","Control segmentado de la navegación principal":"Control segmentado de la navegación principal"
+            }
+        };
+        I18N.en = {
+            ...I18N.es,
+            "Sección de Autenticación":"Authentication","Proyecto de Biología · ETec":"Biology Project · ETec","Mascota Virtual & Hábitos Saludables":"Virtual Pet & Healthy Habits","Correo Electrónico":"Email","Contraseña":"Password","Ingresar":"Log in","Sección de la Encuesta":"Survey","Paso":"Step","de 5":"of 5","Alimentación":"Nutrition","Ejercicio":"Exercise","Sueño":"Sleep","¿Qué hábito de los 3 estudiados querés mejorar primero?":"Which of the 3 studied habits do you want to improve first?","Cuéntanos cómo te nutres día a día.":"Tell us how you eat day to day.","¿Cuántos vasos de agua consumes al día aproximadamente?":"How many glasses of water do you drink per day, approximately?","Menos de 3 vasos":"Fewer than 3 glasses","Entre 3 y 5 vasos":"3 to 5 glasses","Entre 6 y 8 vasos":"6 to 8 glasses","Más de 8 vasos":"More than 8 glasses","¿Con qué frecuencia incluyes frutas y verduras?":"How often do you eat fruits and vegetables?","Selecciona una opción":"Select an option","Rara vez o nunca":"Rarely or never","1 o 2 veces por semana":"Once or twice a week","Todos los días (al menos 1 porción)":"Every day (at least 1 serving)","Todos los días (múltiples porciones)":"Every day (multiple servings)","¿Cuál es tu principal desafío alimenticio?":"What is your main food challenge?","Consumo de ultraprocesados":"Ultra-processed foods","Horarios irregulares":"Irregular meal times","Comer por ansiedad o estrés":"Eating from anxiety or stress","Falta de tiempo para cocinar":"Not enough time to cook","2. Actividad Física":"2. Physical Activity","Queremos entender cuánto mueves tu cuerpo.":"We want to understand how active you are.","¿Cuántos días a la semana realizas actividad física?":"How many days a week do you exercise?","0 días (Sedentario)":"0 days (Sedentary)","1 a 2 días":"1 to 2 days","3 a 4 días":"3 to 4 days","5 o más días":"5 or more days","¿Qué actividades prefieres?":"Which activities do you prefer?","Cardio (Correr, bici, nadar)":"Cardio (Running, cycling, swimming)","Fuerza / Pesas":"Strength / Weights","Caminatas / Senderismo":"Walking / Hiking","Yoga / Pilates / Calistenia":"Yoga / Pilates / Calisthenics","¿Cuánto tiempo pasas sentado/a al día?":"How much time do you spend sitting each day?","Menos de 4 horas":"Less than 4 hours","Entre 4 y 7 horas":"4 to 7 hours","Más de 8 horas":"More than 8 hours","3. Descanso y Sueño":"3. Rest & Sleep","Un buen descanso es la base de tu energía.":"Good rest is the foundation of your energy.","¿Cuántas horas duermes en promedio?":"How many hours do you sleep on average?","Menos de 5 horas":"Less than 5 hours","5 a 6 horas":"5 to 6 hours","7 a 8 horas":"7 to 8 hours","Calidad de tu sueño (1 al 10)":"Sleep quality (1 to 10)","¿Sueles despertar descansado/a?":"Do you usually wake up rested?","A veces":"Sometimes","Casi siempre / Siempre":"Almost always / Always","4. Meditación y Enfoque":"4. Meditation & Focus","Tu paz mental determina tu bienestar.":"Your peace of mind shapes your wellbeing.","¿Experiencia previa en meditación?":"Previous meditation experience?","Nunca lo he probado":"Never tried it","Lo he intentado esporádicamente":"Tried it occasionally","Practico ocasionalmente":"Practice occasionally","Medito diariamente":"Meditate daily","Nivel de estrés semanal (1 al 10)":"Weekly stress level (1 to 10)","5. Desintoxicación Digital":"5. Digital Detox","Desconectar para volver a conectar contigo.":"Disconnect to reconnect with yourself.","¿Tiempo diario en pantallas por ocio?":"Daily recreational screen time?","Menos de 1 hora":"Less than 1 hour","Entre 1 y 3 horas":"1 to 3 hours","Entre 3 y 5 horas":"3 to 5 hours","Más de 5 horas":"More than 5 hours","¿Pantallas justo al despertar o al dormir?":"Screens right after waking up or before sleep?","Ambos (Despertar y acostarse)":"Both (waking up and bedtime)","Solo al despertar":"Only after waking up","Solo antes de dormir":"Only before sleep","Ninguno, lo evito":"Neither, I avoid them","¿Aceptas un Detox Digital de 30 min diarios?":"Would you accept a 30-minute daily digital detox?","Sí, totalmente":"Yes, definitely","Tal vez, me gustaría probar":"Maybe, I'd like to try","Anterior":"Back","Siguiente":"Next","Finalizar & Entrar":"Finish & Enter","Registro de Hábitos":"Habit Tracker","Personalizar":"Customize","Salir":"Log out","¡Bienvenido/a a VitaPet!":"Welcome to VitaPet!","Estadísticas y plan diario adaptado.":"Personalized daily stats and plan.","Mascota Saludable":"Healthy Pet","General & Mascota":"Overview & Pet","Ejercicios":"Exercise","Sueño & Mente":"Sleep & Mind","Mascota":"Pet","Comida":"Food","Alimentación e Hidratación":"Nutrition & Hydration","Mascota Virtual":"Virtual Pet","¡Me siento genial! Gracias por cuidar tu salud.":"I feel great! Thanks for taking care of your health.","Salud":"Health","Energía":"Energy","Ánimo":"Mood","Racha de Ejercicio":"Exercise Streak","Días Consecutivos":"Consecutive Days","Registra tu entrenamiento hoy para sumar días.":"Log today's workout to build your streak.","+ Registrar":"+ Log","Perfil Saludable":"Healthy Profile","Métricas evaluadas en tu registro inicial.":"Metrics from your initial assessment.","Encuesta:":"Survey:","Completada":"Completed","Rehacer":"Redo","Registro diario, no solo resumen de encuesta.":"Daily tracking, not just a survey summary.","Agua de hoy":"Today's water","vasos":"glasses","+1 vaso":"+1 glass","−1":"−1","Reiniciar registro de hoy":"Reset today's record","Plan de mejora progresiva":"Progressive improvement plan","Completá la encuesta para generar una meta personalizada.":"Complete the survey to generate a personalized goal.","Progreso semanal":"Weekly progress","Comidas y preferencias":"Meals & preferences","Necesidad: alimentación equilibrada":"Need: balanced nutrition","Más energía":"More energy","Rendimiento deportivo":"Sports performance","Mejorar regularidad":"Improve regularity","Desayuno":"Breakfast","Almuerzo":"Lunch","Merienda":"Snack","Cena":"Dinner","Guardar preferencias y cronograma":"Save preferences & schedule","Rutinas Recomendadas":"Recommended Workouts","Selecciona para agregar a tu día.":"Select one to add it to your day.","Fuerza":"Strength","3 días/semana":"3 days/week","Rutina A: Fuerza e Hipertrofia":"Workout A: Strength & Hypertrophy","4 Series x 12 Reps: Sentadillas, Flexiones, Peso Muerto y Remo.":"4 Sets x 12 Reps: Squats, Push-ups, Deadlift and Rows.","+ Agregar al Registro de Hoy":"+ Add to Today's Log","2-3 días/semana":"2-3 days/week","Rutina B: Aeróbica & Resistencia":"Workout B: Aerobic & Endurance","30 min de Intervalos moderados en Carrera, Bicicleta o Caminata.":"30 min of moderate intervals: Running, Cycling or Walking.","Movilidad":"Mobility","Diario / Descanso":"Daily / Rest","Rutina C: Yoga & Flexibilidad":"Workout C: Yoga & Flexibility","20 min de ejercicios de estiramiento y postura lumbar.":"20 min of stretching and lower-back posture exercises.","Mes Año":"Month Year","Hoy":"Today","Lu":"Mon","Ma":"Tue","Mi":"Wed","Ju":"Thu","Vi":"Fri","Sá":"Sat","Do":"Sun","Detalles del Día":"Day Details","Cargando fecha...":"Loading date...","Añadir Ejercicio":"Add Exercise","Ubicación":"Location","Casa":"Home","Nombre Ejercicio":"Exercise Name","Rutina completa":"Full workout","Series":"Sets","Reps":"Reps","Registrar":"Log","Registros de este día":"Logs for this day","Registro diario estilo seguimiento de sueño.":"Daily sleep tracking.","Fecha":"Date","Me acosté":"Bedtime","Me levanté":"Wake-up","Calidad (1-10)":"Quality (1-10)","Guardar noche":"Save night","Últimos 7 días":"Last 7 days","Promedio: —":"Average: —","Alarma":"Alarm","Activar":"Enable","Sin alarma activa.":"No active alarm.","Meditación":"Meditation","Iniciar":"Start","Respirá lento y mantené la atención.":"Breathe slowly and stay focused.","Desintoxicación":"Detox","Objetivo de detox":"Detox goal","Reducir uso del celular":"Reduce phone use","Evitar alcohol":"Avoid alcohol","Dejar/reducir tabaco":"Quit/reduce tobacco","Evitar consumo de drogas":"Avoid drug use","Cumplí 30 minutos de detox hoy":"I completed 30 minutes of detox today","Racha: 0 días":"Streak: 0 days","Resumen":"Summary","Encuesta":"Survey","Calidad":"Quality","Estrés":"Stress","Detox":"Detox","Registrá tu primera noche para empezar el gráfico semanal.":"Log your first night to start the weekly chart.","Aviso importante:":"Important notice:","Personalizar mascota":"Customize pet","Nombre":"Name","Tipo":"Type","Perro":"Dog","Gato":"Cat","Conejo":"Rabbit","Zorro":"Fox","Dragón":"Dragon","Color":"Color","Azul":"Blue","Verde":"Green","Violeta":"Purple","Naranja":"Orange","Rosa":"Pink","Accesorio":"Accessory","Ninguno":"None","⭐ Estrella":"⭐ Star","❤️ Corazón":"❤️ Heart","👑 Corona":"👑 Crown","🍃 Hoja":"🍃 Leaf","Guardar cambios":"Save changes"
+        };
+        I18N.pt = {
+            ...I18N.es,
+            "Sección de Autenticación":"Autenticação","Proyecto de Biología · ETec":"Projeto de Biologia · ETec","Mascota Virtual & Hábitos Saludables":"Mascote Virtual & Hábitos Saudáveis","Correo Electrónico":"E-mail","Contraseña":"Senha","Ingresar":"Entrar","Sección de la Encuesta":"Pesquisa","Paso":"Etapa","de 5":"de 5","Alimentación":"Alimentação","Ejercicio":"Exercício","Sueño":"Sono","¿Qué hábito de los 3 estudiados querés mejorar primero?":"Qual dos 3 hábitos estudados você quer melhorar primeiro?","Cuéntanos cómo te nutres día a día.":"Conte como você se alimenta no dia a dia.","Selecciona una opción":"Selecione uma opção","Anterior":"Voltar","Siguiente":"Próximo","Finalizar & Entrar":"Finalizar e Entrar","Registro de Hábitos":"Registro de Hábitos","Personalizar":"Personalizar","Salir":"Sair","¡Bienvenido/a a VitaPet!":"Bem-vindo/a à VitaPet!","Estadísticas y plan diario adaptado.":"Estatísticas e plano diário adaptado.","Mascota Saludable":"Mascote Saudável","General & Mascota":"Geral & Mascote","Ejercicios":"Exercícios","Sueño & Mente":"Sono & Mente","Mascota":"Mascote","Comida":"Comida","Alimentación e Hidratación":"Alimentação e Hidratação","Mascota Virtual":"Mascote Virtual","¡Me siento genial! Gracias por cuidar tu salud.":"Estou me sentindo ótimo! Obrigado por cuidar da sua saúde.","Salud":"Saúde","Energía":"Energia","Ánimo":"Humor","Racha de Ejercicio":"Sequência de Exercícios","Días Consecutivos":"Dias Consecutivos","Registra tu entrenamiento hoy para sumar días.":"Registre seu treino hoje para aumentar a sequência.","+ Registrar":"+ Registrar","Perfil Saludable":"Perfil Saudável","Completada":"Concluída","Rehacer":"Refazer","Agua de hoy":"Água de hoje","vasos":"copos","+1 vaso":"+1 copo","Reiniciar registro de hoy":"Reiniciar registro de hoje","Plan de mejora progresiva":"Plano de melhoria progressiva","Progreso semanal":"Progresso semanal","Comidas y preferencias":"Refeições e preferências","Más energía":"Mais energia","Rendimiento deportivo":"Desempenho esportivo","Mejorar regularidad":"Melhorar regularidade","Desayuno":"Café da manhã","Almuerzo":"Almoço","Merienda":"Lanche","Cena":"Jantar","Guardar preferencias y cronograma":"Salvar preferências e horários","Rutinas Recomendadas":"Treinos Recomendados","Selecciona para agregar a tu día.":"Selecione para adicionar ao seu dia.","Fuerza":"Força","3 días/semana":"3 dias/semana","Cardio":"Cardio","Movilidad":"Mobilidade","Diario / Descanso":"Diário / Descanso","Hoy":"Hoje","Detalles del Día":"Detalhes do Dia","Cargando fecha...":"Carregando data...","Añadir Ejercicio":"Adicionar Exercício","Ubicación":"Local","Casa":"Casa","Nombre Ejercicio":"Nome do Exercício","Rutina completa":"Treino completo","Series":"Séries","Reps":"Repetições","Peso (kg)":"Peso (kg)","Registrar":"Registrar","Registros de este día":"Registros deste dia","Registro diario estilo seguimiento de sueño.":"Registro diário do sono.","Fecha":"Data","Me acosté":"Hora de dormir","Me levanté":"Hora de acordar","Calidad (1-10)":"Qualidade (1-10)","Guardar noche":"Salvar noite","Últimos 7 días":"Últimos 7 dias","Promedio: —":"Média: —","Alarma":"Alarme","Activar":"Ativar","Sin alarma activa.":"Nenhum alarme ativo.","Meditación":"Meditação","Iniciar":"Iniciar","Desintoxicación":"Detox","Objetivo de detox":"Objetivo do detox","Reducir uso del celular":"Reduzir uso do celular","Evitar alcohol":"Evitar álcool","Dejar/reducir tabaco":"Parar/reduzir tabaco","Evitar consumo de drogas":"Evitar uso de drogas","Cumplí 30 minutos de detox hoy":"Cumpri 30 minutos de detox hoje","Racha: 0 días":"Sequência: 0 dias","Resumen":"Resumo","Encuesta":"Pesquisa","Calidad":"Qualidade","Estrés":"Estresse","Registrá tu primera noche para empezar el gráfico semanal.":"Registre sua primeira noite para iniciar o gráfico semanal.","Aviso importante:":"Aviso importante:","Personalizar mascota":"Personalizar mascote","Nombre":"Nome","Tipo":"Tipo","Perro":"Cachorro","Gato":"Gato","Conejo":"Coelho","Zorro":"Raposa","Dragón":"Dragão","Azul":"Azul","Verde":"Verde","Violeta":"Violeta","Naranja":"Laranja","Rosa":"Rosa","Accesorio":"Acessório","Ninguno":"Nenhum","⭐ Estrella":"⭐ Estrela","❤️ Corazón":"❤️ Coração","👑 Corona":"👑 Coroa","🍃 Hoja":"🍃 Folha","Guardar cambios":"Salvar alterações"
+        };
+
+        function translateTextNode(node, lang){
+            const current=node.nodeValue.trim(); if(!current)return;
+            const el=node.parentElement; if(!el || ['SCRIPT','STYLE'].includes(el.tagName))return;
+            let source=el.dataset.i18nEsText;
+            if(!source && I18N.es[current]) source=current;
+            if(!source)return;
+            el.dataset.i18nEsText=source;
+            const translated=(I18N[lang]&&I18N[lang][source])||I18N.es[source]||source;
+            const lead=node.nodeValue.match(/^\s*/)?.[0]||'', trail=node.nodeValue.match(/\s*$/)?.[0]||'';
+            node.nodeValue=lead+translated+trail;
+        }
+        function translateAttributes(lang){
+            const map=I18N[lang]||I18N.es;
+            document.querySelectorAll('input[placeholder],textarea[placeholder],button[aria-label],select[aria-label],input[title],button[title]').forEach(el=>{
+                ['placeholder','aria-label','title'].forEach(attr=>{const v=el.getAttribute(attr);if(!v)return; const src=el.dataset['i18n'+attr.replace(/(^|-)(.)/g,(_,a,b)=>b.toUpperCase())]; const base=src||v; if(map[base]){el.dataset['i18n'+attr.replace(/(^|-)(.)/g,(_,a,b)=>b.toUpperCase())]=base;el.setAttribute(attr,map[base]);}});
+            });
+        }
+        function translateApp(lang){
+            const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+            const nodes=[]; while(walker.nextNode())nodes.push(walker.currentNode); nodes.forEach(n=>translateTextNode(n,lang));
+            translateAttributes(lang);
+            document.title=(I18N[lang]&&I18N[lang]['VitaPet - Hábitos Saludables & Mascota Virtual'])||document.title;
+        }
+        function changeLanguage(lang){
+            if(!I18N[lang])lang='es'; appState.language=lang; saveState(); document.documentElement.lang=lang;
+            translateApp(lang);
+            const sel=document.getElementById('languageSelect'); if(sel)sel.value=lang;
+        }
+        let i18nObserverStarted=false;
+        function startI18nObserver(){
+            if(i18nObserverStarted)return; i18nObserverStarted=true;
+            const observer=new MutationObserver(()=>{ if(window.__i18nBusy)return; window.__i18nBusy=true; translateApp(appState.language||'es'); window.__i18nBusy=false; });
+            observer.observe(document.body,{childList:true,subtree:true});
+        }
+        function restoreLanguage(){const l=appState.language||'es';const sel=document.getElementById('languageSelect');if(sel)sel.value=l;startI18nObserver();changeLanguage(l);}
+        function updateProgressivePlan(){ const el=document.getElementById('nutritionGoalText'); if(!el)return; const base=currentSurveyData.agua; const target=currentSurveyData['habito/objetivo']||'alimentacion'; let goal=8, text='Registrá agua cada día para construir tu promedio semanal.'; if(target==='ejercicio'){text='Tu objetivo principal es ejercicio: priorizá constancia y registrá al menos una rutina adaptada a tu nivel.';} else if(target==='sueno'){text='Tu objetivo principal es sueño: registrá tus noches y buscá una rutina de descanso estable.';} else if(base==='menos-3'){goal=4;text='Semana 1: apuntá a 4 vasos por día. Luego aumentamos de a 1 vaso según tu promedio.';} else if(base==='3/5'){goal=6;text='Semana 1: apuntá a 6 vasos por día. La siguiente meta sube gradualmente si la cumplís.';} else if(base==='mas-8'){goal=9;text='Mantené una hidratación constante y registrá tus vasos para conocer tu promedio real.';} else if(base){goal=8;text='Tu meta inicial es 8 vasos. Buscamos constancia antes de aumentar la meta.';} el.innerText=text; const avg=Object.values(appState.water||{}).slice(-7).reduce((a,b)=>a+b,0)/7; document.getElementById('nutritionGoalBar').style.width=Math.min(100,Math.round(avg/goal*100))+'%'; }
+        function saveSleepLog(e){ e.preventDefault(); const date=document.getElementById('sleepDate').value, start=document.getElementById('sleepStart').value, end=document.getElementById('sleepEnd').value, quality=Number(document.getElementById('sleepQualityInput').value); let [sh,sm]=start.split(':').map(Number),[eh,em]=end.split(':').map(Number); let mins=(eh*60+em)-(sh*60+sm); if(mins<=0)mins+=1440; const log={id:Date.now(),date,start,end,minutes:mins,quality}; sleepLogs=sleepLogs.filter(x=>x.date!==date); sleepLogs.unshift(log); saveState(); renderSleepDashboard(); adaptPetStats(currentSurveyData); }
+        function renderSleepDashboard(){ const chart=document.getElementById('sleepChart'); if(!chart)return; const days=[]; for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().split('T')[0]);} const logs=days.map(d=>sleepLogs.find(x=>x.date===d)); const vals=logs.filter(Boolean).map(x=>x.minutes/60); const avg=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0; document.getElementById('sleepAverage').innerText=avg?`Promedio: ${avg.toFixed(1)} h`:'Promedio: —'; chart.innerHTML=logs.map((l,i)=>{const h=l?Math.min(100,Math.max(8,l.minutes/600*100)):5; const label=days[i].slice(8); return `<div class="flex flex-col items-center justify-end h-full"><div title="${l? (l.minutes/60).toFixed(1)+' h':'Sin registro'}" class="w-full max-w-8 rounded-t-lg bg-violet-500/80" style="height:${h}%"></div><span class="text-[9px] text-slate-500 mt-1">${label}</span></div>`}).join(''); const hist=document.getElementById('sleepHistory'); hist.innerHTML=logs.filter(Boolean).slice().reverse().map(l=>`<div class="flex justify-between text-[10px] bg-white/70 p-2 rounded-lg"><span>${l.date}</span><strong>${(l.minutes/60).toFixed(1)} h · ${l.quality}/10</strong></div>`).join('')||'<p class="text-[10px] text-slate-500">Todavía no hay noches registradas.</p>'; }
+        function setAlarm(){ const t=document.getElementById('alarmTime').value; if(!t)return; appState.alarm=t; saveState(); scheduleAlarm(); document.getElementById('alarmStatus').innerText='Alarma activa a las '+t+'. Mantén la app abierta para que suene.'; }
+        function scheduleAlarm(){ if(alarmTimer)clearInterval(alarmTimer); if(!appState.alarm)return; alarmTimer=setInterval(()=>{const n=new Date(),t=n.toTimeString().slice(0,5);if(t===appState.alarm){try{const ctx=new (window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=880;o.connect(g).connect(ctx.destination);g.gain.value=.2;o.start();setTimeout(()=>{o.stop();ctx.close();},1200);}catch(e){} alert('⏰ Hora de levantarse: '+appState.alarm);}},15000); }
+        function updatePetName(name){appState.pet.name=name||'Koda';saveState();document.getElementById('petName').innerText=appState.pet.name;}
+        function updatePetFromAllHabits(){ const water=(appState.water?.[todayISO()]||0), w=Number(currentSurveyData.agua==='menos-3'?4:8), hydration=Math.min(1,water/w); const sleep=sleepLogs.find(x=>x.date===todayISO()); const sleepScore=sleep?Math.min(1,sleep.minutes/(8*60)):0.5; const ex=workoutLogs.some(x=>x.date===todayISO())?1:0.3; return {hydration,sleepScore,ex}; }
+        function updateProgressivePlanAndPet(){updateProgressivePlan();adaptPetStats(currentSurveyData);}
+        function updateSurveyUI() {
+            const steps = document.querySelectorAll('.survey-step-content');
+            steps.forEach(step => step.classList.add('hidden'));
+
+            const activeStep = document.querySelector(
+                `.survey-step-content[data-step="${currentSurveyStep}"]`
+            );
+            if (activeStep) {
+                activeStep.classList.remove('hidden');
+                // Reinicia la animación de entrada en cada cambio.
+                activeStep.style.animation = 'none';
+                requestAnimationFrame(() => {
+                    activeStep.style.animation = '';
+                });
+            }
+
+            // El progreso representa el paso COMPLETADO/actual:
+            // 1/5 = 20%, 2/5 = 40%, ... 5/5 = 100%.
+            const progress = Math.round((currentSurveyStep / totalSurveySteps) * 100);
+
+            const bar = document.getElementById('surveyProgressBar');
+            const badge = document.getElementById('surveyStepNum');
+            const stepText = document.getElementById('surveyStepNumText');
+            const totalText = document.getElementById('surveyTotalSteps');
+            const name = document.getElementById('surveyStepName');
+            const percent = document.getElementById('surveyProgressPercent');
+            const hint = document.getElementById('surveyProgressHint');
+
+            if (bar) {
+                bar.style.width = progress + '%';
+                bar.setAttribute('aria-valuenow', progress);
+            }
+            if (badge) badge.innerText = currentSurveyStep;
+            if (stepText) stepText.innerText = currentSurveyStep;
+            if (totalText) totalText.innerText = totalSurveySteps;
+            if (name) name.innerText = stepNames[currentSurveyStep - 1] || '';
+            if (percent) percent.innerText = progress + '%';
+
+            const hints = [
+                'Empecemos por tus hábitos diarios',
+                'Conocé tu nivel de movimiento',
+                'Evaluemos tu descanso',
+                'Cuidemos tu bienestar mental',
+                'Encontrá un mejor equilibrio digital'
+            ];
+            if (hint) hint.innerText = hints[currentSurveyStep - 1] || '';
+
+            document.querySelectorAll('.survey-progress-step').forEach((el, i) => {
+                el.classList.toggle('active', i === currentSurveyStep - 1);
+                el.classList.toggle('done', i < currentSurveyStep);
+            });
+
+            const prev = document.getElementById('surveyPrevBtn');
+            const next = document.getElementById('surveyNextBtn');
+            const submit = document.getElementById('surveySubmitBtn');
+
+            if (prev) prev.disabled = currentSurveyStep === 1;
+
+            if (currentSurveyStep === totalSurveySteps) {
+                next.classList.add('hidden');
+                submit.classList.remove('hidden');
+            } else {
+                next.classList.remove('hidden');
+                submit.classList.add('hidden');
+            }
+        }
+
+        function validateCurrentStep() {
+            const currentStepEl = document.querySelector(`.survey-step-content[data-step="${currentSurveyStep}"]`);
+            const selects = currentStepEl.querySelectorAll('select');
+            
+            for (let select of selects) {
+                if (select.value === "") return false;
+            }
+            return true;
+        }
+
+        function changeSurveyStep(direction) {
+            if (direction === 1 && !validateCurrentStep()) {
+                alert("Por favor, completa los campos requeridos.");
+                return;
+            }
+
+            const nextStep = Math.max(
+                1,
+                Math.min(totalSurveySteps, currentSurveyStep + direction)
+            );
+
+            if (nextStep === currentSurveyStep) {
+                updateSurveyUI();
+                return;
+            }
+
+            currentSurveyStep = nextStep;
+            updateSurveyUI();
+
+            // Lleva la vista suavemente al inicio de la tarjeta.
+            const surveyCard = document.querySelector('#screen-survey .glass-card');
+            if (surveyCard) {
+                surveyCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        updateSurveyUI();
+
+        document.getElementById('rangeSueno').addEventListener('input', (e) => {
+            document.getElementById('rangeSuenoVal').innerText = `${e.target.value} / 10`;
+        });
+        document.getElementById('rangeEstres').addEventListener('input', (e) => {
+            document.getElementById('rangeEstresVal').innerText = `${e.target.value} / 10`;
+        });
+
+        document.getElementById('surveyForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            if (!validateCurrentStep()) {
+                alert("Por favor, completa las preguntas requeridas.");
+                return;
+            }
+
+            const formData = new FormData(this);
+            currentSurveyData = {};
+
+            formData.forEach((value, key) => {
+                if (currentSurveyData[key]) {
+                    if (!Array.isArray(currentSurveyData[key])) {
+                        currentSurveyData[key] = [currentSurveyData[key]];
+                    }
+                    currentSurveyData[key].push(value);
+                } else {
+                    currentSurveyData[key] = value;
+                }
+            });
+
+            renderProfileSummaryCards(currentSurveyData);
+            populateIndividualModules(currentSurveyData);
+            adaptPetStats(currentSurveyData);
+            saveState();
+            updateProgressivePlan();
+
+            const statusTexto = document.getElementById('statusEncuestaTexto');
+            if (statusTexto) {
+                statusTexto.innerText = 'Completada';
+                statusTexto.className = 'text-emerald-700 font-bold';
+            }
+
+            showScreen('screen-main');
+            switchTab('tab-dashboard');
+        });
+
+        function renderProfileSummaryCards(data) {
+            const container = document.getElementById('profileSummaryCards');
+            const formatArray = (val) => Array.isArray(val) ? val.join(', ') : (val || 'N/A');
+
+            const items = [
+                { title: 'Hidratación', icon: 'fa-droplet', color: 'text-sky-600', val: `${data.agua || 'N/A'} v.` },
+                { title: 'Vegetales', icon: 'fa-leaf', color: 'text-emerald-600', val: data['frutas/verduras'] || 'N/A' },
+                { title: 'Ejercicio', icon: 'fa-dumbbell', color: 'text-indigo-600', val: `${data['ejercicio/frecuencia'] || '0'} d/sem` },
+                { title: 'Actividad', icon: 'fa-person-running', color: 'text-brand-600', val: formatArray(data['tipo/ejercicio']) },
+                { title: 'Sueño', icon: 'fa-moon', color: 'text-purple-600', val: `${data['horas/sueno'] || 'N/A'} h` },
+                { title: 'Estrés', icon: 'fa-brain', color: 'text-rose-600', val: `${data['nivel/estres'] || 5} / 10` }
+            ];
+
+            container.innerHTML = items.map(item => `
+                <div class="bg-white/80 p-2.5 rounded-2xl border border-slate-200 flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center ${item.color} text-sm shadow-sm shrink-0">
+                        <i class="fa-solid ${item.icon}"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-[8px] uppercase font-extrabold text-slate-400 leading-none">${item.title}</p>
+                        <p class="text-[11px] font-bold text-slate-800 capitalize truncate mt-0.5">${item.val}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function populateIndividualModules(data) {
+            document.getElementById('sleepHours').innerText = data['horas/sueno'] ? `${data['horas/sueno']} hrs` : '—';
+            document.getElementById('sleepQuality').innerText = `${data['calidad/sueno'] || '—'} / 10`;
+            document.getElementById('sleepStress').innerText = `${data['nivel/estres'] || '—'} / 10`;
+            document.getElementById('sleepDetox').innerText = data['dispuesta/detox'] === 'si' ? 'Sí' : 'En proceso';
+            renderWater(); renderSleepDashboard(); updateProgressivePlan();
+        }
+
+        function addQuickWorkout(name, sets, reps) {
+            const todayISO = new Date().toISOString().split('T')[0];
+            const newLog = {
+                id: Date.now(),
+                date: selectedDateStr || todayISO,
+                location: 'Gimnasio',
+                name: name,
+                sets: sets,
+                reps: reps,
+                weight: '0'
+            };
+            workoutLogs.unshift(newLog);
+            saveState();
+            renderCalendar();
+            renderDayWorkoutLogs();
+            updateStreakDisplay();
+            adaptPetStats(currentSurveyData);
+        }
+
+        function adaptPetStats(data) {
+            const habits=updatePetFromAllHabits();
+            let health=55 + habits.hydration*20 + habits.sleepScore*15 + habits.ex*10;
+            let energy=45 + habits.sleepScore*35 + habits.ex*15 + habits.hydration*5;
+            let mood=60 + habits.sleepScore*15 + habits.ex*10 + habits.hydration*10;
+            const estres=parseInt(data['nivel/estres']||5); mood-=estres*2;
+            const currentStreak=calculateStreak(); energy+=Math.min(15,currentStreak*3); mood+=Math.min(15,currentStreak*3);
+            health=Math.min(100,Math.max(20,Math.round(health))); energy=Math.min(100,Math.max(20,Math.round(energy))); mood=Math.min(100,Math.max(20,Math.round(mood)));
+            document.getElementById('valHealth').innerText=health+'%'; document.getElementById('barHealth').style.width=health+'%'; document.getElementById('valEnergy').innerText=energy+'%'; document.getElementById('barEnergy').style.width=energy+'%'; document.getElementById('valMood').innerText=mood+'%'; document.getElementById('barMood').style.width=mood+'%';
+            const status=health>=80?'¡Koda está genial!':health>=60?'Koda está bastante bien.':'Koda pide un poco de atención hoy.'; document.getElementById('petStatusText').innerText=status;
+            document.getElementById('petName').innerText=appState.pet?.name||'Koda'; applyPetCustomization();
+        }
+
+        function handleFitnessWorkoutSubmit(e) {
+            e.preventDefault();
+
+            const date = document.getElementById('fitnessDateInput').value;
+            const location = document.querySelector('input[name="fitnessLocation"]:checked').value;
+            const name = document.getElementById('fitnessWorkoutName').value;
+            const sets = document.getElementById('fitnessWorkoutSets').value || '-';
+            const reps = document.getElementById('fitnessWorkoutReps').value || '-';
+            const weight = document.getElementById('fitnessWorkoutWeight').value || '0';
+            const completed = document.getElementById('fitnessCompleted')?.checked || false;
+
+            const newLog = { 
+                id: Date.now(), 
+                date, 
+                location, 
+                name, 
+                sets, 
+                reps, 
+                weight,
+                completed
+            };
+            
+            workoutLogs.unshift(newLog);
+            saveState();
+            
+            document.getElementById('fitnessWorkoutName').value = '';
+            document.getElementById('fitnessWorkoutSets').value = '';
+            document.getElementById('fitnessWorkoutReps').value = '';
+            document.getElementById('fitnessWorkoutWeight').value = '';
+            if (document.getElementById('fitnessCompleted')) document.getElementById('fitnessCompleted').checked = false;
+
+            selectedDateStr = date;
+            renderCalendar();
+            renderDayWorkoutLogs();
+            updateStreakDisplay();
+            adaptPetStats(currentSurveyData);
+        }
+
+        function calculateStreak() {
+            if (workoutLogs.length === 0) return 0;
+
+            const datesWithWorkout = new Set(workoutLogs.map(l => l.date));
+            let streak = 0;
+            let checkDate = new Date();
+
+            const todayStr = checkDate.toISOString().split('T')[0];
+            if (!datesWithWorkout.has(todayStr)) {
+                checkDate.setDate(checkDate.getDate() - 1);
+            }
+
+            while (true) {
+                const dateStr = checkDate.toISOString().split('T')[0];
+                if (datesWithWorkout.has(dateStr)) {
+                    streak++;
+                    checkDate.setDate(checkDate.getDate() - 1);
+                } else {
+                    break;
+                }
+            }
+
+            return streak;
+        }
+
+        function updateStreakDisplay() {
+            const streak = calculateStreak();
+            
+            document.getElementById('streakDaysCount').innerText = streak;
+            const streakMsg = document.getElementById('streakMessage');
+            if (streak === 0) {
+                streakMsg.innerText = "Registra tu entrenamiento hoy para iniciar racha.";
+            } else if (streak === 1) {
+                streakMsg.innerText = "¡Buen comienzo! Sigue mañana para sumar días.";
+            } else {
+                streakMsg.innerText = `¡Llevas ${streak} días seguidos! Tu mascota celebra.`;
+            }
+
+            document.getElementById('fitnessTabStreakVal').innerText = `Racha: ${streak}d`;
+        }
+
+        function renderCalendar() {
+            const year = calendarCurrentDate.getFullYear();
+            const month = calendarCurrentDate.getMonth();
+
+            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            document.getElementById('calendarMonthYear').innerText = `${monthNames[month]} ${year}`;
+
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+
+            const firstDayOfMonth = new Date(year, month, 1);
+            let startingDay = firstDayOfMonth.getDay() - 1;
+            if (startingDay === -1) startingDay = 6;
+
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            for (let i = startingDay; i > 0; i--) {
+                const dayNum = daysInPrevMonth - i + 1;
+                const prevDate = new Date(year, month - 1, dayNum);
+                const dateStr = prevDate.toISOString().split('T')[0];
+                grid.appendChild(createDayButton(dayNum, dateStr, true));
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const currDate = new Date(year, month, day);
+                const dateStr = currDate.toISOString().split('T')[0];
+                const btn = createDayButton(day, dateStr, false);
+                
+                if (dateStr === todayStr) btn.classList.add('today');
+                if (dateStr === selectedDateStr) btn.classList.add('selected');
+                
+                grid.appendChild(btn);
+            }
+
+            const totalCells = startingDay + daysInMonth;
+            const nextDays = (42 - totalCells) % 7; 
+            for (let i = 1; i <= nextDays; i++) {
+                const nextDate = new Date(year, month + 1, i);
+                const dateStr = nextDate.toISOString().split('T')[0];
+                grid.appendChild(createDayButton(i, dateStr, true));
+            }
+        }
+
+        function createDayButton(dayNum, dateStr, isOtherMonth) {
+            const btn = document.createElement('button');
+            btn.className = `calendar-day-btn ${isOtherMonth ? 'other-month' : ''}`;
+            btn.innerHTML = `<span>${dayNum}</span>`;
+
+            const hasEvents = workoutLogs.some(log => log.date === dateStr);
+            if (hasEvents) {
+                const dot = document.createElement('span');
+                dot.className = 'has-events-dot';
+                btn.appendChild(dot);
+            }
+
+            btn.onclick = () => {
+                selectedDateStr = dateStr;
+                const fitDateInput = document.getElementById('fitnessDateInput');
+                if (fitDateInput) fitDateInput.value = dateStr;
+                renderCalendar();
+                updateSelectedDateView();
+            };
+
+            return btn;
+        }
+
+        function navigateMonth(direction) {
+            calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() + direction);
+            renderCalendar();
+        }
+
+        function goToToday() {
+            calendarCurrentDate = new Date();
+            selectedDateStr = new Date().toISOString().split('T')[0];
+            const fitDateInput = document.getElementById('fitnessDateInput');
+            if (fitDateInput) fitDateInput.value = selectedDateStr;
+            renderCalendar();
+            updateSelectedDateView();
+        }
+
+        function updateSelectedDateView() {
+            const parts = selectedDateStr.split('-');
+            const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+            
+            const options = { weekday: 'short', day: 'numeric', month: 'short' };
+            const formatted = dateObj.toLocaleDateString('es-ES', options);
+
+            document.getElementById('selectedDateTitle').innerText = formatted;
+            renderDayWorkoutLogs();
+        }
+
+        function renderDayWorkoutLogs() {
+            const container = document.getElementById('dayWorkoutLogsList');
+            const logsForDay = workoutLogs.filter(log => log.date === selectedDateStr);
+            
+            document.getElementById('dayLogsCount').innerText = logsForDay.length;
+
+            if (logsForDay.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-3 text-slate-500 text-xs">
+                        Sin ejercicios este día.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = logsForDay.map(log => `
+                <div class="p-2 bg-white/80 rounded-xl border border-slate-200 flex justify-between items-center text-xs">
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 rounded-lg ${log.location === 'Gimnasio' ? 'bg-indigo-600' : 'bg-emerald-600'} text-white flex items-center justify-center text-[10px] shrink-0">
+                            <i class="fa-solid ${log.location === 'Gimnasio' ? 'fa-dumbbell' : 'fa-house'}"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-[11px] leading-tight">${log.name}</h4>
+                            <p class="text-[9px] text-slate-500">${log.sets}x${log.reps} | <strong>${log.weight} kg</strong></p>
+                        </div>
+                    </div>
+                    <button onclick="deleteWorkoutLog(${log.id})" class="text-rose-500 active:text-rose-700 text-xs p-1">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function deleteWorkoutLog(id) {
+            workoutLogs = workoutLogs.filter(log => log.id !== id);
+            saveState();
+            renderCalendar();
+            renderDayWorkoutLogs();
+            updateStreakDisplay();
+            adaptPetStats(currentSurveyData);
+        }
+
+        updateSurveyUI();
+        scheduleAlarm();
+    </script>
+    <!-- Control segmentado de la navegación principal -->
+    <script>
+        function initSegmentedControl(root, { onChange } = {}) {
+          const pill = root.querySelector('.seg__pill');
+          const buttons = Array.from(root.querySelectorAll('.seg__btn'));
+          const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+          const move = (x, y = 0, extra = '') => `translate3d(${x}px, ${y}px, 0) ${extra}`.trim();
+
+          // Colores por defecto (se usan si el botón no tiene data-color)
+          const PALETTE = ['#6366f1', '#059669', '#d97706', '#db2777', '#0284c7'];
+          const colorOf = (i) => buttons[i].dataset.color || PALETTE[i % PALETTE.length];
+          const glow = (c) =>
+            `0 6px 18px color-mix(in srgb, ${c} 45%, transparent), 0 1px 2px rgba(15, 23, 42, 0.2)`;
+
+          // Una animación distinta por opción (si hay más de 5, se repiten en orden).
+          // a = posición de origen {x, w}, b = posición de destino {x, w}
+          const MOTIONS = [
+            {
+              name: 'Resorte',
+              duration: 560,
+              easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)',   // rebasa el destino y vuelve
+              origin: '50% 50%',
+              pill: (a, b) => [
+                { transform: move(a.x), width: a.w + 'px' },
+                { transform: move(b.x), width: b.w + 'px' }
+              ],
+              icon: [
+                { transform: 'scale(1)' },
+                { transform: 'scale(1.5)', offset: 0.4 },
+                { transform: 'scale(1)' }
+              ]
+            },
+            {
+              name: 'Líquido',
+              duration: 540,
+              easing: 'ease-in-out',                         // se estira y luego se contrae
+              origin: '50% 50%',
+              pill: (a, b) => {
+                const left = Math.min(a.x, b.x);
+                const right = Math.max(a.x + a.w, b.x + b.w);
+                return [
+                  { transform: move(a.x), width: a.w + 'px' },
+                  { transform: move(left), width: right - left + 'px', offset: 0.5 },
+                  { transform: move(b.x), width: b.w + 'px' }
+                ];
+              },
+              icon: [
+                { transform: 'rotate(0deg)' },
+                { transform: 'rotate(360deg)' }
+              ]
+            },
+            {
+              name: 'Salto',
+              duration: 680,
+              easing: 'linear',                              // el easing va dentro de cada tramo
+              origin: '50% 100%',                            // se aplasta contra el suelo
+              pill: (a, b) => {
+                const mx = (a.x + b.x) / 2;
+                const mw = (a.w + b.w) / 2;
+                return [
+                  { transform: move(a.x, 0, 'scale(1, 1)'), width: a.w + 'px', easing: 'cubic-bezier(0.2, 0.7, 0.4, 1)' },
+                  { transform: move(mx, -16, 'scale(0.96, 1.1)'), width: mw + 'px', offset: 0.45, easing: 'cubic-bezier(0.6, 0, 0.9, 0.6)' },
+                  { transform: move(b.x, 0, 'scale(1.1, 0.82)'), width: b.w + 'px', offset: 0.72, easing: 'ease-out' },
+                  { transform: move(b.x, 0, 'scale(0.98, 1.05)'), width: b.w + 'px', offset: 0.88, easing: 'ease-out' },
+                  { transform: move(b.x, 0, 'scale(1, 1)'), width: b.w + 'px' }
+                ];
+              },
+              icon: [
+                { transform: 'translateY(0)' },
+                { transform: 'translateY(-9px)', offset: 0.35 },
+                { transform: 'translateY(0)', offset: 0.7 },
+                { transform: 'translateY(-3px)', offset: 0.85 },
+                { transform: 'translateY(0)' }
+              ]
+            },
+            {
+              name: 'Giro 3D',
+              duration: 640,
+              easing: 'cubic-bezier(0.65, 0, 0.35, 1)',      // voltereta mientras viaja
+              origin: '50% 50%',
+              pill: (a, b) => [
+                { transform: move(a.x, 0, 'rotateX(0deg)'), width: a.w + 'px' },
+                { transform: move((a.x + b.x) / 2, 0, 'rotateX(180deg)'), width: (a.w + b.w) / 2 + 'px', offset: 0.5 },
+                { transform: move(b.x, 0, 'rotateX(360deg)'), width: b.w + 'px' }
+              ],
+              icon: [
+                { transform: 'perspective(120px) rotateY(0deg)' },
+                { transform: 'perspective(120px) rotateY(360deg)' }
+              ]
+            },
+            {
+              name: 'Gelatina',
+              duration: 760,
+              easing: 'linear',                              // el easing va dentro de cada tramo
+              origin: '50% 50%',
+              pill: (a, b) => {
+                const d = b.x >= a.x ? 1 : -1;
+                const at = (t) => a.x + (b.x - a.x) * t;
+                return [
+                  { transform: move(a.x, 0, 'skewX(0deg)'), width: a.w + 'px', easing: 'ease-out' },
+                  { transform: move(at(0.55), 0, `skewX(${-22 * d}deg)`), width: a.w * 1.1 + 'px', offset: 0.3, easing: 'ease-in-out' },
+                  { transform: move(at(1.08), 0, `skewX(${12 * d}deg)`), width: b.w + 'px', offset: 0.55, easing: 'ease-in-out' },
+                  { transform: move(at(0.97), 0, `skewX(${-6 * d}deg)`), width: b.w + 'px', offset: 0.75, easing: 'ease-in-out' },
+                  { transform: move(at(1.01), 0, `skewX(${2 * d}deg)`), width: b.w + 'px', offset: 0.9, easing: 'ease-out' },
+                  { transform: move(b.x, 0, 'skewX(0deg)'), width: b.w + 'px' }
+                ];
+              },
+              icon: [
+                { transform: 'rotate(0deg)' },
+                { transform: 'rotate(-28deg)', offset: 0.25 },
+                { transform: 'rotate(22deg)', offset: 0.5 },
+                { transform: 'rotate(-10deg)', offset: 0.75 },
+                { transform: 'rotate(0deg)' }
+              ]
+            }
+          ];
+
+          let index = Math.max(0, buttons.findIndex((b) => b.getAttribute('aria-checked') === 'true'));
+          let animation = null;
+
+          // Estado real del indicador en este instante (también si está en plena animación)
+          const measure = () => {
+            const cs = getComputedStyle(pill);
+            return {
+              x: new DOMMatrixReadOnly(cs.transform).m41,
+              w: parseFloat(cs.width) || 0,
+              bg: cs.backgroundColor,
+              shadow: cs.boxShadow
+            };
+          };
+
+          // Coloca el indicador (posición y color) sin animar sobre la opción activa
+          const layout = () => {
+            const btn = buttons[index];
+            const color = colorOf(index);
+            pill.style.width = btn.offsetWidth + 'px';
+            pill.style.transform = move(btn.offsetLeft);
+            pill.style.backgroundColor = color;
+            pill.style.boxShadow = glow(color);
+            root.style.setProperty('--seg-accent', color);
+          };
+
+          function select(next) {
+            if (next === index || next < 0 || next >= buttons.length) return;
+
+            const from = measure();
+            const motion = MOTIONS[next % MOTIONS.length];
+            index = next;
+
+            buttons.forEach((btn, i) => {
+              btn.setAttribute('aria-checked', String(i === next));
+              btn.tabIndex = i === next ? 0 : -1;
+            });
+
+            if (animation) animation.cancel();
+            layout();                                        // estado final real
+
+            if (!reduceMotion.matches) {
+              const to = { x: buttons[next].offsetLeft, w: buttons[next].offsetWidth };
+              const frames = motion.pill(from, to);
+
+              // El color y el brillo viajan del valor anterior al nuevo durante todo el movimiento
+              frames[0].backgroundColor = from.bg;
+              frames[0].boxShadow = from.shadow;
+              frames[frames.length - 1].backgroundColor = colorOf(next);
+              frames[frames.length - 1].boxShadow = glow(colorOf(next));
+
+              pill.style.transformOrigin = motion.origin;
+              animation = pill.animate(frames, { duration: motion.duration, easing: motion.easing });
+
+              const icon = buttons[next].querySelector('.seg__icon');
+              if (icon) icon.animate(motion.icon, { duration: motion.duration, easing: 'ease-out' });
+            }
+
+            if (onChange) {
+              onChange({
+                index: next,
+                value: buttons[next].dataset.value,
+                label: buttons[next].textContent.trim(),
+                color: colorOf(next),
+                motion: motion.name
+              });
+            }
+          }
+
+          // Clic
+          buttons.forEach((btn, i) => btn.addEventListener('click', () => select(i)));
+
+          // Arrastre: pulsa y desliza el dedo / mouse sobre el control
+          let dragging = false;
+          const pick = (e) => {
+            const x = e.clientX - root.getBoundingClientRect().left;
+            const i = buttons.findIndex((b) => x < b.offsetLeft + b.offsetWidth);
+            select(i === -1 ? buttons.length - 1 : i);
+          };
+          const stopDrag = () => { dragging = false; };
+          root.addEventListener('pointerdown', (e) => {
+            if (e.pointerType === 'mouse' && e.button !== 0) return;
+            dragging = true;
+            pick(e);
+          });
+          root.addEventListener('pointermove', (e) => { if (dragging) pick(e); });
+          window.addEventListener('pointerup', stopDrag);
+          window.addEventListener('pointercancel', stopDrag);
+
+          // Teclado
+          root.addEventListener('keydown', (e) => {
+            const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+            let next = null;
+            if (step) next = (index + step + buttons.length) % buttons.length;
+            else if (e.key === 'Home') next = 0;
+            else if (e.key === 'End') next = buttons.length - 1;
+            if (next === null) return;
+            e.preventDefault();
+            select(next);
+            buttons[next].focus();
+          });
+
+          // Recalcula si cambia el ancho del contenedor
+          const resizeObserver = new ResizeObserver(() => {
+            if (animation) animation.cancel();
+            layout();
+          });
+          resizeObserver.observe(root);
+          layout();
+
+          return {
+            select,
+            destroy() {
+              resizeObserver.disconnect();
+              window.removeEventListener('pointerup', stopDrag);
+              window.removeEventListener('pointercancel', stopDrag);
+            }
+          };
+        }
+
+        (function () {
+            const MAIN_TABS = ['tab-dashboard', 'tab-nutrition', 'tab-fitness', 'tab-sleep'];
+            // Escritorio (debajo del saludo) y teléfono (barra inferior)
+            const selectors = ['mainTabSelector', 'mobileTabSelector']
+                .map((id) => document.getElementById(id))
+                .filter(Boolean)
+                .map((root) => initSegmentedControl(root, {
+                    onChange: ({ value }) => switchTab(value)
+                }));
+
+            // switchTab() llama a esto para que ambos controles sigan a la sección activa
+            window.syncMainTabSelector = (tabId) => {
+                const i = MAIN_TABS.indexOf(tabId);
+                selectors.forEach((s) => s.select(i));
+            };
+        })();
+    </script>
+</body>
+</html>
